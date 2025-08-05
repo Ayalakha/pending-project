@@ -10,7 +10,7 @@ Route::get('/user', function (Request $request) {
 // Sample API endpoints for React connection
 Route::get('/test', function () {
     return response()->json([
-        'message' => 'Hello from Laravel API!',
+        'message' => 'the api works fine',
         'timestamp' => now(),
         'status' => 'success'
     ]);
