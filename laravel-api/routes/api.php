@@ -1,7 +1,10 @@
 <?php
 
 use App\Http\Controllers\Auth\AuthController;
+use App\Http\Controllers\BlogController;
+use App\Http\Controllers\CommentController;
 use App\Http\Controllers\CompanyController;
+use App\Http\Controllers\ServiceOrProductController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -11,7 +14,16 @@ Route::post('/auth/login', [AuthController::class, 'login']);
 
 // Public company routes (browse companies)
 Route::get('/companies', [CompanyController::class, 'index']);
+Route::get('/companies/search', [CompanyController::class, 'search']);
 Route::get('/companies/{company}', [CompanyController::class, 'show']);
+
+// Public service/product routes (browse services/products)
+Route::get('/companies/{company}/services-products', [ServiceOrProductController::class, 'index']);
+Route::get('/services-products/{serviceOrProduct}', [ServiceOrProductController::class, 'show']);
+
+// Public blog routes (browse blogs)
+Route::get('/companies/{company}/blogs', [BlogController::class, 'index']);
+Route::get('/blogs/{blog}', [BlogController::class, 'show']);
 
 // Protected routes
 Route::middleware('auth:sanctum')->group(function () {
@@ -20,7 +32,10 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/auth/me', [AuthController::class, 'me']);
     
     // User routes (all authenticated users)
-    // Comments, etc. will go here
+    // Comments on blogs - any authenticated user can comment
+    Route::post('/blogs/{blog}/comments', [CommentController::class, 'store']);
+    Route::put('/comments/{comment}', [CommentController::class, 'update']);
+    Route::delete('/comments/{comment}', [CommentController::class, 'destroy']);
     
     // Owner routes (company owners)
     Route::middleware('role:owner,superAdmin')->group(function () {
@@ -28,6 +43,16 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/companies', [CompanyController::class, 'store']);
         Route::put('/companies/{company}', [CompanyController::class, 'update']);
         Route::delete('/companies/{company}', [CompanyController::class, 'destroy']);
+        
+        // Service/Product management for company owners
+        Route::post('/companies/{company}/services-products', [ServiceOrProductController::class, 'store']);
+        Route::put('/services-products/{serviceOrProduct}', [ServiceOrProductController::class, 'update']);
+        Route::delete('/services-products/{serviceOrProduct}', [ServiceOrProductController::class, 'destroy']);
+        
+        // Blog management for company owners
+        Route::post('/companies/{company}/blogs', [BlogController::class, 'store']);
+        Route::put('/blogs/{blog}', [BlogController::class, 'update']);
+        Route::delete('/blogs/{blog}', [BlogController::class, 'destroy']);
     });
     
     // Super Admin routes

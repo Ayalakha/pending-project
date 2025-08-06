@@ -1,0 +1,81 @@
+
+ //  Model Relationship Tree
+
+User
+├── companies (hasMany Company)
+├── blogs (hasMany Blog)  
+└── comments (hasMany Comment)
+
+Company
+├── owner (belongsTo User)
+└── servicesOrProducts (hasMany ServiceOrProduct)
+
+Blog
+├── author (belongsTo User)
+└── comments (hasMany Comment)
+
+Comment
+├── author (belongsTo User)
+└── blog (belongsTo Blog)
+
+ServiceOrProduct
+└── company (belongsTo Company)
+
+ ---------------------------------------------------------
+
+// Authentication Endpoints
+
+POST /api/auth/register   - User registration
+POST /api/auth/login      - User login  
+POST /api/auth/logout     - User logout (protected)
+GET  /api/auth/me         - Get current user (protected)POST /api/auth/register
+
+---------------------------------------------------------------
+
+// Company Management 
+
+GET  /api/companies                 - Browse all companies (public)
+GET  /api/companies/search          - Search companies (public)  
+GET  /api/companies/{id}            - View company details (public)
+GET  /api/my-companies             - Get user's companies (owner+)
+POST /api/companies                - Create company (owner+)
+PUT  /api/companies/{id}           - Update company (owner+)
+DELETE /api/companies/{id}         - Delete company (owner+)
+
+-----------------------------------------------------------------
+
+// Services/Products Management
+
+GET  /api/companies/{id}/services-products    - Browse company services/products (public)
+GET  /api/services-products/{id}              - View service/product details (public)
+POST /api/companies/{id}/services-products    - Add service/product (owner+)
+PUT  /api/services-products/{id}              - Update service/product (owner+)
+DELETE /api/services-products/{id}            - Delete service/product (owner+)
+
+
+-----------------------------------------------------------------
+
+// Blog Management
+
+GET  /api/companies/{id}/blogs     - Browse company blogs (public)
+GET  /api/blogs/{id}               - View blog details (public)
+POST /api/companies/{id}/blogs     - Create blog (owner+)
+PUT  /api/blogs/{id}               - Update blog (owner+)
+DELETE /api/blogs/{id}             - Delete blog (owner+)    
+
+
+-------------------------------------------------------------------
+
+// Comment System
+
+POST /api/blogs/{id}/comments      - Add comment (authenticated users)
+PUT  /api/comments/{id}            - Update comment (comment owner/admin)
+DELETE /api/comments/{id}          - Delete comment (comment owner/admin)
+
+------------------------------------------------------------------
+
+//  Role-Based Access Control 
+
+ user (default): Can browse, register, login, comment
+ owner: Can manage their own companies, services, products, and blogs
+ superAdmin: Full access to all resources 
