@@ -15,6 +15,7 @@ class BlogController extends Controller
     public function index(Company $company)
     {
         $blogs = $company->blogs()
+            ->with('comments.user:id,username')
             ->orderBy('created_at', 'desc')
             ->get();
 
