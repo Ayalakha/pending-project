@@ -26,11 +26,6 @@ class Company extends Model
         return $this->hasMany(ServiceOrProduct::class);
     }
 
-    public function blogs()
-    {
-        return $this->hasMany(Blog::class);
-    }
-
     // Helper methods
     public function isOwnedBy(User $user)
     {

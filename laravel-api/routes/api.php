@@ -22,7 +22,7 @@ Route::get('/companies/{company}/services-products', [ServiceOrProductController
 Route::get('/services-products/{serviceOrProduct}', [ServiceOrProductController::class, 'show']);
 
 // Public blog routes (browse blogs)
-Route::get('/companies/{company}/blogs', [BlogController::class, 'index']);
+Route::get('/blogs', [BlogController::class, 'index']);
 Route::get('/blogs/{blog}', [BlogController::class, 'show']);
 
 // Protected routes
@@ -48,15 +48,15 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/companies/{company}/services-products', [ServiceOrProductController::class, 'store']);
         Route::put('/services-products/{serviceOrProduct}', [ServiceOrProductController::class, 'update']);
         Route::delete('/services-products/{serviceOrProduct}', [ServiceOrProductController::class, 'destroy']);
-        
-        // Blog management for company owners
-        Route::post('/companies/{company}/blogs', [BlogController::class, 'store']);
-        Route::put('/blogs/{blog}', [BlogController::class, 'update']);
-        Route::delete('/blogs/{blog}', [BlogController::class, 'destroy']);
     });
     
     // Super Admin routes
     Route::middleware('role:superAdmin')->group(function () {
+        // Blog management for superAdmins only
+        Route::post('/blogs', [BlogController::class, 'store']);
+        Route::put('/blogs/{blog}', [BlogController::class, 'update']);
+        Route::delete('/blogs/{blog}', [BlogController::class, 'destroy']);
+        
         Route::get('/admin/users', function () {
             return response()->json(['message' => 'Admin users list']);
         });

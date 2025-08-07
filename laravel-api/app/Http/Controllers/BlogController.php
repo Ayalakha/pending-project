@@ -3,19 +3,17 @@
 namespace App\Http\Controllers;
 
 use App\Models\Blog;
-use App\Models\Company;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
 class BlogController extends Controller
 {
     /**
-     * Display blogs for a specific company
+     * Display all blogs
      */
-    public function index(Company $company)
+    public function index()
     {
-        $blogs = $company->blogs()
-            ->with('comments.user:id,username')
+        $blogs = Blog::with(['author:id,username'])
             ->orderBy('created_at', 'desc')
             ->get();
 
@@ -26,15 +24,15 @@ class BlogController extends Controller
     }
 
     /**
-     * Store a new blog for a company
+     * Store a new blog (superAdmin only)
      */
-    public function store(Request $request, Company $company)
+    public function store(Request $request)
     {
-        // Check if user owns the company or is admin
-        if (!$company->isOwnedBy($request->user()) && !$request->user()->isSuperAdmin()) {
+        // Only superAdmins can create blogs
+        if (!$request->user()->isSuperAdmin()) {
             return response()->json([
                 'status' => 'error',
-                'message' => 'Unauthorized to create blogs for this company'
+                'message' => 'Unauthorized. Only superAdmins can create blogs'
             ], 403);
         }
 
@@ -53,10 +51,10 @@ class BlogController extends Controller
         $blog = Blog::create([
             'title' => $request->input('title'),
             'content' => $request->input('content'),
-            'company_id' => $company->id,
+            'user_id' => $request->user()->id,
         ]);
 
-        $blog->load('company');
+        $blog->load('author:id,username');
 
         return response()->json([
             'status' => 'success',
@@ -70,7 +68,7 @@ class BlogController extends Controller
      */
     public function show(Blog $blog)
     {
-        $blog->load('company.owner', 'comments.user');
+        $blog->load('author:id,username');
 
         return response()->json([
             'status' => 'success',
@@ -79,15 +77,15 @@ class BlogController extends Controller
     }
 
     /**
-     * Update a specific blog
+     * Update a specific blog (superAdmin only)
      */
     public function update(Request $request, Blog $blog)
     {
-        // Check if user owns the company or is admin
-        if (!$blog->company->isOwnedBy($request->user()) && !$request->user()->isSuperAdmin()) {
+        // Only superAdmins can update blogs
+        if (!$request->user()->isSuperAdmin()) {
             return response()->json([
                 'status' => 'error',
-                'message' => 'Unauthorized to update this blog'
+                'message' => 'Unauthorized. Only superAdmins can update blogs'
             ], 403);
         }
 
@@ -108,7 +106,7 @@ class BlogController extends Controller
             'content' => $request->input('content'),
         ]);
 
-        $blog->load('company');
+        $blog->load('author:id,username');
 
         return response()->json([
             'status' => 'success',
@@ -118,15 +116,15 @@ class BlogController extends Controller
     }
 
     /**
-     * Remove a specific blog
+     * Remove a specific blog (superAdmin only)
      */
     public function destroy(Request $request, Blog $blog)
     {
-        // Check if user owns the company or is admin
-        if (!$blog->company->isOwnedBy($request->user()) && !$request->user()->isSuperAdmin()) {
+        // Only superAdmins can delete blogs
+        if (!$request->user()->isSuperAdmin()) {
             return response()->json([
                 'status' => 'error',
-                'message' => 'Unauthorized to delete this blog'
+                'message' => 'Unauthorized. Only superAdmins can delete blogs'
             ], 403);
         }
 

@@ -12,13 +12,13 @@ class Blog extends Model
     protected $fillable = [
         'title',
         'content',
-        'company_id',
+        'user_id',
     ];
 
     // Relationships
-    public function company()
+    public function author()
     {
-        return $this->belongsTo(Company::class);
+        return $this->belongsTo(User::class, 'user_id');
     }
 
     public function comments()
@@ -29,7 +29,7 @@ class Blog extends Model
     // Helper methods
     public function isOwnedBy(User $user)
     {
-        return $this->company->isOwnedBy($user);
+        return $this->user_id === $user->id;
     }
 
     public function getExcerptAttribute()
