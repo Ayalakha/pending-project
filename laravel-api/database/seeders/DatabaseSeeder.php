@@ -3,8 +3,8 @@
 namespace Database\Seeders;
 
 use App\Models\User;
-// use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\DB;
 
 class DatabaseSeeder extends Seeder
 {
@@ -13,11 +13,21 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // User::factory(10)->create();
+        // Clear existing data (SQLite compatible)
+        DB::statement('PRAGMA foreign_keys = OFF;');
+        \App\Models\Comment::truncate();
+        \App\Models\Blog::truncate();
+        \App\Models\ServiceOrProduct::truncate();
+        \App\Models\Company::truncate();
+        \App\Models\User::truncate();
+        DB::statement('PRAGMA foreign_keys = ON;');
 
-        User::factory()->create([
-            'username' => 'Test User',
-            'email' => 'test@example.com',
+        // Run seeders in order (due to foreign key dependencies)
+        $this->call([
+            CompanySeeder::class,
+            ServiceOrProductSeeder::class,
+            BlogSeeder::class,
         ]);
+        $this->command->info('All sample data seeded successfully!');
     }
 }
