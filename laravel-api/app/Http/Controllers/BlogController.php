@@ -39,6 +39,7 @@ class BlogController extends Controller
         $validator = Validator::make($request->all(), [
             'title' => 'required|string|max:255',
             'content' => 'required|string',
+            'image' => 'nullable|string|max:255',
         ]);
 
         if ($validator->fails()) {
@@ -51,6 +52,7 @@ class BlogController extends Controller
         $blog = Blog::create([
             'title' => $request->input('title'),
             'content' => $request->input('content'),
+            'image' => $request->input('image'),
             'user_id' => $request->user()->id,
         ]);
 
@@ -92,6 +94,7 @@ class BlogController extends Controller
         $validator = Validator::make($request->all(), [
             'title' => 'required|string|max:255',
             'content' => 'required|string',
+            'image' => 'nullable|string|max:255',
         ]);
 
         if ($validator->fails()) {
@@ -104,6 +107,7 @@ class BlogController extends Controller
         $blog->update([
             'title' => $request->input('title'),
             'content' => $request->input('content'),
+            'image' => $request->input('image'),
         ]);
 
         $blog->load('author:id,username');

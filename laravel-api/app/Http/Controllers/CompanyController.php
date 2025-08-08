@@ -31,6 +31,12 @@ class CompanyController extends Controller
         $validator = Validator::make($request->all(), [
             'name' => 'required|string|max:255',
             'description' => 'nullable|string|max:1000',
+            'logo' => 'nullable|string|max:255',
+            'website' => 'nullable|url|max:255',
+            'phone_number' => 'nullable|string|max:50',
+            'capital' => 'nullable|string|max:100',
+            'rc' => 'nullable|string|max:100',
+            'legal_form' => 'nullable|string|max:100',
         ]);
 
         if ($validator->fails()) {
@@ -43,6 +49,12 @@ class CompanyController extends Controller
         $company = Company::create([
             'name' => $request->name,
             'description' => $request->description,
+            'logo' => $request->logo,
+            'website' => $request->website,
+            'phone_number' => $request->phone_number,
+            'capital' => $request->capital,
+            'rc' => $request->rc,
+            'legal_form' => $request->legal_form,
             'owner_id' => $request->user()->id,
         ]);
 
@@ -85,6 +97,12 @@ class CompanyController extends Controller
         $validator = Validator::make($request->all(), [
             'name' => 'required|string|max:255',
             'description' => 'nullable|string|max:1000',
+            'logo' => 'nullable|string|max:255',
+            'website' => 'nullable|url|max:255',
+            'phone_number' => 'nullable|string|max:50',
+            'capital' => 'nullable|string|max:100',
+            'rc' => 'nullable|string|max:100',
+            'legal_form' => 'nullable|string|max:100',
         ]);
 
         if ($validator->fails()) {
@@ -97,6 +115,12 @@ class CompanyController extends Controller
         $company->update([
             'name' => $request->name,
             'description' => $request->description,
+            'logo' => $request->logo,
+            'website' => $request->website,
+            'phone_number' => $request->phone_number,
+            'capital' => $request->capital,
+            'rc' => $request->rc,
+            'legal_form' => $request->legal_form,
         ]);
 
         $company->load('owner', 'servicesOrProducts');
