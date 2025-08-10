@@ -1,12 +1,23 @@
-import { Link, useLocation } from 'react-router-dom'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { Search, Building2, BookOpen, User, Menu, X } from 'lucide-react'
 import { useState } from 'react'
 
 const Header = () => {
   const location = useLocation()
+  const navigate = useNavigate()
   const [isMenuOpen, setIsMenuOpen] = useState(false)
+  const [searchQuery, setSearchQuery] = useState('')
 
   const isActive = (path) => location.pathname === path
+
+  const handleSearch = (e) => {
+    e.preventDefault()
+    if (searchQuery.trim()) {
+      navigate(`/companies?search=${encodeURIComponent(searchQuery)}`)
+      setSearchQuery('')
+      setIsMenuOpen(false) // Close mobile menu if open
+    }
+  }
 
   const navigation = [
     { name: 'Home', href: '/', icon: null },
@@ -49,14 +60,16 @@ const Header = () => {
 
           {/* Search Bar */}
           <div className="hidden md:flex flex-1 max-w-md mx-8">
-            <div className="relative w-full">
+            <form onSubmit={handleSearch} className="relative w-full">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
               <input
                 type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Search companies..."
                 className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none"
               />
-            </div>
+            </form>
           </div>
 
           {/* Auth Buttons */}
@@ -94,14 +107,16 @@ const Header = () => {
             <div className="space-y-2">
               {/* Mobile Search */}
               <div className="px-2 mb-4">
-                <div className="relative">
+                <form onSubmit={handleSearch} className="relative">
                   <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
                   <input
                     type="text"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
                     placeholder="Search companies..."
                     className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none"
                   />
-                </div>
+                </form>
               </div>
 
               {/* Mobile Navigation */}

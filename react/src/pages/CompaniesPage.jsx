@@ -1,7 +1,8 @@
 import { useQuery } from '@tanstack/react-query'
 import { companyService } from '../services/companyService'
-import { Building2, MapPin, Phone, Globe, Users, Loader2 } from 'lucide-react'
-import { Link } from 'react-router-dom'
+import { Building2, MapPin, Phone, Globe, Users, Loader2, Search, X } from 'lucide-react'
+import { Link, useSearchParams } from 'react-router-dom'
+import { useState, useEffect } from 'react'
 
 const CompanyCard = ({ company }) => {
   return (
@@ -76,10 +77,50 @@ const CompanyCard = ({ company }) => {
 }
 
 const CompaniesPage = () => {
+  const [searchParams, setSearchParams] = useSearchParams()
+  const [localSearch, setLocalSearch] = useState('')
+  const searchQuery = searchParams.get('search') || ''
+
+  // Sync local search with URL search params
+  useEffect(() => {
+    console.log('URL search params changed:', searchQuery)
+    console.log('Current full URL:', window.location.href)
+    setLocalSearch(searchQuery)
+  }, [searchQuery])
+
   const { data, isLoading, error } = useQuery({
-    queryKey: ['companies'],
-    queryFn: () => companyService.getCompanies(),
+    queryKey: ['companies', searchQuery],
+    queryFn: () => companyService.getCompanies(searchQuery ? { search: searchQuery } : {}),
   })
+
+  const handleSearch = (e) => {
+    e.preventDefault()
+    console.log('Search submitted:', localSearch.trim())
+    console.log('Current URL:', window.location.href)
+    
+    if (localSearch.trim()) {
+      // Update URL with search parameter
+      const newParams = new URLSearchParams(searchParams)
+      newParams.set('search', localSearch.trim())
+      setSearchParams(newParams)
+      console.log('Setting search params to:', newParams.toString())
+    } else {
+      // Clear search if empty
+      const newParams = new URLSearchParams(searchParams)
+      newParams.delete('search')
+      setSearchParams(newParams)
+      console.log('Clearing search params')
+    }
+  }
+
+  const clearSearch = () => {
+    console.log('Clearing search')
+    setLocalSearch('')
+    const newParams = new URLSearchParams(searchParams)
+    newParams.delete('search')
+    setSearchParams(newParams)
+    console.log('Search cleared, new URL should be:', window.location.pathname)
+  }
 
   if (isLoading) {
     return (
@@ -112,11 +153,55 @@ const CompaniesPage = () => {
       {/* Header */}
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-gray-900 mb-4">
-          All Companies
+          {searchQuery ? `Search Results for "${searchQuery}"` : 'All Companies'}
         </h1>
-        <p className="text-gray-600">
-          Discover businesses and services in our directory
+        <p className="text-gray-600 mb-6">
+          {searchQuery 
+            ? `Found ${companies.length} companies matching your search`
+            : 'Discover businesses and services in our directory'
+          }
         </p>
+
+        {/* Search Bar */}
+        <div className="max-w-2xl">
+          <form onSubmit={handleSearch} className="relative">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
+            <input
+              type="text"
+              value={localSearch}
+              onChange={(e) => setLocalSearch(e.target.value)}
+              placeholder="Search companies by name or description..."
+              className="w-full pl-10 pr-12 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none text-lg"
+            />
+            {localSearch && (
+              <button
+                type="button"
+                onClick={clearSearch}
+                className="absolute right-10 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            )}
+            <button
+              type="submit"
+              className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-primary-600 hover:bg-primary-700 text-white px-4 py-1.5 rounded-md text-sm font-medium transition-colors"
+            >
+              Search
+            </button>
+          </form>
+        </div>
+
+        {searchQuery && (
+          <div className="mt-4">
+            <button
+              onClick={clearSearch}
+              className="inline-flex items-center text-sm text-gray-600 hover:text-gray-900"
+            >
+              <X className="h-4 w-4 mr-1" />
+              Clear search
+            </button>
+          </div>
+        )}
       </div>
 
       {/* Companies Grid */}

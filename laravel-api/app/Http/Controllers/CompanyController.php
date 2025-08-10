@@ -11,11 +11,21 @@ class CompanyController extends Controller
     /**
      * Display a listing of all companies (Public route)
      */
-    public function index()
+    public function index(Request $request)
     {
-        $companies = Company::with('owner', 'servicesOrProducts')
-            ->orderBy('created_at', 'desc')
-            ->paginate(10);
+        $query = Company::with('owner', 'servicesOrProducts')
+            ->orderBy('created_at', 'desc');
+
+        // Add search functionality
+        if ($request->has('search') && !empty($request->search)) {
+            $searchTerm = $request->search;
+            $query->where(function ($q) use ($searchTerm) {
+                $q->where('name', 'LIKE', "%{$searchTerm}%")
+                  ->orWhere('description', 'LIKE', "%{$searchTerm}%");
+            });
+        }
+
+        $companies = $query->paginate(10);
 
         return response()->json([
             'status' => 'success',
