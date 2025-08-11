@@ -24,6 +24,7 @@ Route::get('/services-products/{serviceOrProduct}', [ServiceOrProductController:
 // Public blog routes (browse blogs)
 Route::get('/blogs', [BlogController::class, 'index']);
 Route::get('/blogs/{blog}', [BlogController::class, 'show']);
+Route::get('/blogs/{blog}/comments', [CommentController::class, 'index']);
 
 // Protected routes
 Route::middleware('auth:sanctum')->group(function () {

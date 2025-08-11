@@ -108,6 +108,14 @@ const Header = () => {
                       </span>
                     </div>
                     <Link
+                      to="/dashboard"
+                      onClick={() => setIsUserMenuOpen(false)}
+                      className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                    >
+                      <User className="h-4 w-4 mr-2" />
+                      Dashboard
+                    </Link>
+                    <Link
                       to="/profile"
                       onClick={() => setIsUserMenuOpen(false)}
                       className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
@@ -115,16 +123,6 @@ const Header = () => {
                       <Settings className="h-4 w-4 mr-2" />
                       Profile Settings
                     </Link>
-                    {user?.role === 'owner' && (
-                      <Link
-                        to="/dashboard"
-                        onClick={() => setIsUserMenuOpen(false)}
-                        className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
-                      >
-                        <Building2 className="h-4 w-4 mr-2" />
-                        My Companies
-                      </Link>
-                    )}
                     <button
                       onClick={handleLogout}
                       className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"

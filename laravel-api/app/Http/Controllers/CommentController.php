@@ -10,6 +10,22 @@ use Illuminate\Support\Facades\Validator;
 class CommentController extends Controller
 {
     /**
+     * Get all comments for a specific blog
+     */
+    public function index(Blog $blog)
+    {
+        $comments = $blog->comments()
+            ->with('user:id,username')
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        return response()->json([
+            'status' => 'success',
+            'comments' => $comments
+        ]);
+    }
+
+    /**
      * Store a new comment on a blog
      */
     public function store(Request $request, Blog $blog)
