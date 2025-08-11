@@ -1,12 +1,19 @@
 import { Link, useLocation, useNavigate } from 'react-router-dom'
-import { Search, Building2, BookOpen, User, Menu, X } from 'lucide-react'
+import { Search, Building2, BookOpen, User, Menu, X, LogOut, Settings } from 'lucide-react'
 import { useState } from 'react'
+import { useAuth } from '../../contexts/AuthContext'
+import { useClickOutside } from '../../hooks/useClickOutside'
 
 const Header = () => {
   const location = useLocation()
   const navigate = useNavigate()
+  const { user, isAuthenticated, logout } = useAuth()
   const [isMenuOpen, setIsMenuOpen] = useState(false)
+  const [isUserMenuOpen, setIsUserMenuOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
+
+  // Close user menu when clicking outside
+  const userMenuRef = useClickOutside(() => setIsUserMenuOpen(false))
 
   const isActive = (path) => location.pathname === path
 
@@ -17,6 +24,12 @@ const Header = () => {
       setSearchQuery('')
       setIsMenuOpen(false) // Close mobile menu if open
     }
+  }
+
+  const handleLogout = async () => {
+    await logout()
+    setIsUserMenuOpen(false)
+    navigate('/')
   }
 
   const navigation = [
@@ -72,20 +85,72 @@ const Header = () => {
             </form>
           </div>
 
-          {/* Auth Buttons */}
+          {/* Auth Section */}
           <div className="hidden md:flex items-center space-x-4">
-            <Link
-              to="/login"
-              className="text-gray-600 hover:text-gray-900 px-3 py-2 text-sm font-medium"
-            >
-              Sign In
-            </Link>
-            <Link
-              to="/register"
-              className="btn-primary text-sm"
-            >
-              Sign Up
-            </Link>
+            {isAuthenticated ? (
+              <div className="relative" ref={userMenuRef}>
+                <button
+                  onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
+                  className="flex items-center space-x-2 text-gray-700 hover:text-gray-900 px-3 py-2 rounded-lg hover:bg-gray-50 transition-colors"
+                >
+                  <User className="h-5 w-5" />
+                  <span className="text-sm font-medium">{user?.username}</span>
+                </button>
+
+                {/* User Dropdown Menu */}
+                {isUserMenuOpen && (
+                  <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-1 z-10">
+                    <div className="px-4 py-2 border-b border-gray-200">
+                      <p className="text-sm font-medium text-gray-900">{user?.username}</p>
+                      <p className="text-sm text-gray-600">{user?.email}</p>
+                      <span className="inline-block px-2 py-1 text-xs font-medium bg-primary-100 text-primary-800 rounded-full mt-1">
+                        {user?.role}
+                      </span>
+                    </div>
+                    <Link
+                      to="/profile"
+                      onClick={() => setIsUserMenuOpen(false)}
+                      className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                    >
+                      <Settings className="h-4 w-4 mr-2" />
+                      Profile Settings
+                    </Link>
+                    {user?.role === 'owner' && (
+                      <Link
+                        to="/dashboard"
+                        onClick={() => setIsUserMenuOpen(false)}
+                        className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                      >
+                        <Building2 className="h-4 w-4 mr-2" />
+                        My Companies
+                      </Link>
+                    )}
+                    <button
+                      onClick={handleLogout}
+                      className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                    >
+                      <LogOut className="h-4 w-4 mr-2" />
+                      Sign Out
+                    </button>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <>
+                <Link
+                  to="/login"
+                  className="text-gray-600 hover:text-gray-900 px-3 py-2 text-sm font-medium"
+                >
+                  Sign In
+                </Link>
+                <Link
+                  to="/register"
+                  className="btn-primary text-sm"
+                >
+                  Sign Up
+                </Link>
+              </>
+            )}
           </div>
 
           {/* Mobile menu button */}
@@ -141,20 +206,62 @@ const Header = () => {
 
               {/* Mobile Auth */}
               <div className="pt-4 border-t border-gray-200 space-y-2">
-                <Link
-                  to="/login"
-                  onClick={() => setIsMenuOpen(false)}
-                  className="block px-4 py-3 text-base font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-lg"
-                >
-                  Sign In
-                </Link>
-                <Link
-                  to="/register"
-                  onClick={() => setIsMenuOpen(false)}
-                  className="block mx-4 btn-primary text-center"
-                >
-                  Sign Up
-                </Link>
+                {isAuthenticated ? (
+                  <>
+                    <div className="px-4 py-3 bg-gray-50 rounded-lg mx-2">
+                      <p className="text-sm font-medium text-gray-900">{user?.username}</p>
+                      <p className="text-sm text-gray-600">{user?.email}</p>
+                      <span className="inline-block px-2 py-1 text-xs font-medium bg-primary-100 text-primary-800 rounded-full mt-1">
+                        {user?.role}
+                      </span>
+                    </div>
+                    <Link
+                      to="/profile"
+                      onClick={() => setIsMenuOpen(false)}
+                      className="flex items-center px-4 py-3 text-base font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-lg"
+                    >
+                      <Settings className="h-5 w-5 mr-2" />
+                      Profile Settings
+                    </Link>
+                    {user?.role === 'owner' && (
+                      <Link
+                        to="/dashboard"
+                        onClick={() => setIsMenuOpen(false)}
+                        className="flex items-center px-4 py-3 text-base font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-lg"
+                      >
+                        <Building2 className="h-5 w-5 mr-2" />
+                        My Companies
+                      </Link>
+                    )}
+                    <button
+                      onClick={() => {
+                        handleLogout()
+                        setIsMenuOpen(false)
+                      }}
+                      className="flex items-center w-full px-4 py-3 text-base font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-lg"
+                    >
+                      <LogOut className="h-5 w-5 mr-2" />
+                      Sign Out
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    <Link
+                      to="/login"
+                      onClick={() => setIsMenuOpen(false)}
+                      className="block px-4 py-3 text-base font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-lg"
+                    >
+                      Sign In
+                    </Link>
+                    <Link
+                      to="/register"
+                      onClick={() => setIsMenuOpen(false)}
+                      className="block mx-4 btn-primary text-center"
+                    >
+                      Sign Up
+                    </Link>
+                  </>
+                )}
               </div>
             </div>
           </div>
