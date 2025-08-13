@@ -1,0 +1,317 @@
+import { useState } from 'react'
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { adminService } from '../../services/adminService'
+import { useAuth } from '../../contexts/AuthContext'
+import { 
+  Users, 
+  Search, 
+  Filter,
+  MoreVertical,
+  Edit,
+  Trash2,
+  Ban,
+  UserCheck,
+  Crown,
+  Building2,
+  Loader2,
+  AlertCircle,
+  Check,
+  X
+} from 'lucide-react'
+import { Navigate } from 'react-router-dom'
+
+const UserRow = ({ user, onUpdate }) => {
+  const [isMenuOpen, setIsMenuOpen] = useState(false)
+  const queryClient = useQueryClient()
+
+  const updateRoleMutation = useMutation({
+    mutationFn: ({ userId, role }) => adminService.updateUserRole(userId, role),
+    onSuccess: () => {
+      queryClient.invalidateQueries(['adminUsers'])
+      onUpdate()
+    }
+  })
+
+  const deleteUserMutation = useMutation({
+    mutationFn: (userId) => adminService.deleteUser(userId),
+    onSuccess: () => {
+      queryClient.invalidateQueries(['adminUsers'])
+      onUpdate()
+    }
+  })
+
+  const handleRoleChange = (newRole) => {
+    if (window.confirm(`Change ${user.username}'s role to ${newRole}?`)) {
+      updateRoleMutation.mutate({ userId: user.id, role: newRole })
+    }
+    setIsMenuOpen(false)
+  }
+
+  const handleDelete = () => {
+    if (window.confirm(`Are you sure you want to delete user "${user.username}"? This action cannot be undone.`)) {
+      deleteUserMutation.mutate(user.id)
+    }
+    setIsMenuOpen(false)
+  }
+
+  const getRoleBadge = (role) => {
+    const badges = {
+      superAdmin: { color: 'bg-red-100 text-red-800', icon: Crown, label: 'Super Admin' },
+      owner: { color: 'bg-blue-100 text-blue-800', icon: Building2, label: 'Owner' },
+      user: { color: 'bg-green-100 text-green-800', icon: UserCheck, label: 'User' }
+    }
+    const badge = badges[role] || badges.user
+    const IconComponent = badge.icon
+    
+    return (
+      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${badge.color}`}>
+        <IconComponent className="w-3 h-3 mr-1" />
+        {badge.label}
+      </span>
+    )
+  }
+
+  const formatDate = (dateString) => {
+    return new Date(dateString).toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric'
+    })
+  }
+
+  return (
+    <tr className="hover:bg-gray-50">
+      <td className="px-6 py-4 whitespace-nowrap">
+        <div className="flex items-center">
+          <div className="w-10 h-10 bg-primary-100 rounded-full flex items-center justify-center">
+            <Users className="h-5 w-5 text-primary-600" />
+          </div>
+          <div className="ml-4">
+            <div className="text-sm font-medium text-gray-900">{user.username}</div>
+            <div className="text-sm text-gray-500">{user.email}</div>
+          </div>
+        </div>
+      </td>
+      <td className="px-6 py-4 whitespace-nowrap">
+        {getRoleBadge(user.role)}
+      </td>
+      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+        {formatDate(user.created_at)}
+      </td>
+      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+          <Check className="w-3 h-3 mr-1" />
+          Active
+        </span>
+      </td>
+      <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+        <div className="relative">
+          <button
+            onClick={() => setIsMenuOpen(!isMenuOpen)}
+            className="text-gray-400 hover:text-gray-600 p-2 rounded-lg hover:bg-gray-100"
+          >
+            <MoreVertical className="h-4 w-4" />
+          </button>
+          
+          {isMenuOpen && (
+            <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-1 z-10">
+              <div className="px-3 py-2 border-b border-gray-200">
+                <p className="text-xs font-medium text-gray-500">Change Role</p>
+              </div>
+              {['user', 'owner', 'superAdmin'].map((role) => (
+                <button
+                  key={role}
+                  onClick={() => handleRoleChange(role)}
+                  disabled={user.role === role || updateRoleMutation.isLoading}
+                  className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {role === 'superAdmin' ? 'Super Admin' : role.charAt(0).toUpperCase() + role.slice(1)}
+                  {user.role === role && ' (Current)'}
+                </button>
+              ))}
+              <div className="border-t border-gray-200 mt-1">
+                <button
+                  onClick={handleDelete}
+                  disabled={deleteUserMutation.isLoading}
+                  className="w-full text-left px-4 py-2 text-sm text-red-700 hover:bg-red-50 disabled:opacity-50"
+                >
+                  <Trash2 className="h-4 w-4 inline mr-2" />
+                  Delete User
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
+      </td>
+    </tr>
+  )
+}
+
+const UserManagementPage = () => {
+  const { user, isAuthenticated } = useAuth()
+  const [searchTerm, setSearchTerm] = useState('')
+  const [roleFilter, setRoleFilter] = useState('')
+
+  // Check admin permissions
+  if (!isAuthenticated || user?.role !== 'superAdmin') {
+    return <Navigate to="/login" replace />
+  }
+
+  // Fetch users
+  const { data: usersData, isLoading, error, refetch } = useQuery({
+    queryKey: ['adminUsers', searchTerm, roleFilter],
+    queryFn: () => adminService.getAllUsers({
+      search: searchTerm,
+      role: roleFilter
+    }),
+    keepPreviousData: true,
+  })
+
+  const users = usersData?.users || []
+
+  const handleRefresh = () => {
+    refetch()
+  }
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gray-50 py-8">
+        <div className="container mx-auto px-4">
+          <div className="flex items-center justify-center py-12">
+            <Loader2 className="h-8 w-8 animate-spin text-primary-600" />
+            <span className="ml-2 text-gray-600">Loading users...</span>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gray-50 py-8">
+        <div className="container mx-auto px-4">
+          <div className="bg-red-50 border border-red-200 rounded-lg p-6 text-center">
+            <AlertCircle className="h-12 w-12 text-red-600 mx-auto mb-4" />
+            <h2 className="text-lg font-medium text-red-800 mb-2">Error Loading Users</h2>
+            <p className="text-red-600">Failed to load user data. Please try again later.</p>
+            <button onClick={handleRefresh} className="mt-4 btn-primary">
+              Try Again
+            </button>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  return (
+    <div className="min-h-screen bg-gray-50 py-8">
+      <div className="container mx-auto px-4">
+        {/* Header */}
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">User Management</h1>
+          <p className="text-gray-600">
+            Manage user accounts, roles, and permissions across the platform
+          </p>
+        </div>
+
+        {/* Search and Filters */}
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between space-y-4 md:space-y-0 md:space-x-4">
+            <div className="flex-1 max-w-md">
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                <input
+                  type="text"
+                  placeholder="Search users by name or email..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none"
+                />
+              </div>
+            </div>
+            
+            <div className="flex items-center space-x-4">
+              <div className="flex items-center space-x-2">
+                <Filter className="h-4 w-4 text-gray-400" />
+                <select
+                  value={roleFilter}
+                  onChange={(e) => setRoleFilter(e.target.value)}
+                  className="border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none"
+                >
+                  <option value="">All Roles</option>
+                  <option value="user">Users</option>
+                  <option value="owner">Owners</option>
+                  <option value="superAdmin">Super Admins</option>
+                </select>
+              </div>
+              
+              <button
+                onClick={handleRefresh}
+                className="btn-primary"
+              >
+                Refresh
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* Users Table */}
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+          <div className="px-6 py-4 border-b border-gray-200">
+            <h2 className="text-lg font-medium text-gray-900">
+              Users ({users.length})
+            </h2>
+          </div>
+          
+          {users.length > 0 ? (
+            <div className="overflow-x-auto">
+              <table className="min-w-full divide-y divide-gray-200">
+                <thead className="bg-gray-50">
+                  <tr>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      User
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Role
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Joined
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Status
+                    </th>
+                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Actions
+                    </th>
+                  </tr>
+                </thead>
+                <tbody className="bg-white divide-y divide-gray-200">
+                  {users.map((userData) => (
+                    <UserRow 
+                      key={userData.id} 
+                      user={userData} 
+                      onUpdate={handleRefresh}
+                    />
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          ) : (
+            <div className="text-center py-12">
+              <Users className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+              <h3 className="text-lg font-medium text-gray-900 mb-2">No Users Found</h3>
+              <p className="text-gray-600">
+                {searchTerm || roleFilter 
+                  ? 'No users match your current filters.' 
+                  : 'No users found in the system.'
+                }
+              </p>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  )
+}
+
+export default UserManagementPage

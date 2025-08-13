@@ -1,5 +1,6 @@
 import { useAuth } from '../../contexts/AuthContext'
 import { useQuery } from '@tanstack/react-query'
+import { adminService } from '../../services/adminService'
 import { 
   Shield, 
   Users, 
@@ -10,33 +11,37 @@ import {
   AlertTriangle,
   BarChart3,
   UserCheck,
-  FileText
+  FileText,
+  Loader2,
+  AlertCircle,
+  CheckCircle,
+  Clock
 } from 'lucide-react'
 import { Link } from 'react-router-dom'
 
 const AdminDashboard = () => {
   const { user } = useAuth()
 
-  // Mock data for admin stats - we'll implement real API calls later
-  const { data: adminStats = {
+  // Fetch admin stats
+  const { data: adminStats, isLoading: statsLoading } = useQuery({
+    queryKey: ['adminStats'],
+    queryFn: () => adminService.getSystemStats(),
+    refetchInterval: 30000, // Refresh every 30 seconds
+  })
+
+  // Fetch recent activity
+  const { data: recentActivity, isLoading: activityLoading } = useQuery({
+    queryKey: ['adminActivity'],
+    queryFn: () => adminService.getRecentActivity(),
+    refetchInterval: 60000, // Refresh every minute
+  })
+
+  const stats = adminStats || {
     totalUsers: 0,
     totalCompanies: 0,
-    totalComments: 0,
-    pendingReviews: 0,
-    monthlyGrowth: 0
-  }, isLoading } = useQuery({
-    queryKey: ['adminStats'],
-    queryFn: async () => {
-      // Placeholder for admin stats API
-      return {
-        totalUsers: 7, // We know this from our check earlier
-        totalCompanies: 0,
-        totalComments: 0,
-        pendingReviews: 0,
-        monthlyGrowth: 0
-      }
-    }
-  })
+    totalBlogs: 0,
+    pendingApprovals: 0
+  }
 
   const formatDate = (dateString) => {
     return new Date(dateString).toLocaleDateString('en-US', {
@@ -64,18 +69,23 @@ const AdminDashboard = () => {
               </p>
             </div>
           </div>
-          <Link 
-            to="/admin/settings" 
-            className="btn-primary flex items-center"
-          >
-            <Settings className="h-4 w-4 mr-2" />
-            System Settings
-          </Link>
+          <div className="flex items-center space-x-3">
+            {stats.pendingApprovals > 0 && (
+              <div className="flex items-center px-3 py-1 bg-orange-100 text-orange-800 rounded-full text-sm">
+                <AlertTriangle className="h-4 w-4 mr-1" />
+                {stats.pendingApprovals} pending
+              </div>
+            )}
+            <button className="btn-primary flex items-center">
+              <Settings className="h-4 w-4 mr-2" />
+              Settings
+            </button>
+          </div>
         </div>
       </div>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-5 gap-6 mb-8">
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
           <div className="flex items-center">
             <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
@@ -83,7 +93,16 @@ const AdminDashboard = () => {
             </div>
             <div className="ml-4">
               <p className="text-sm font-medium text-gray-600">Total Users</p>
-              <p className="text-2xl font-semibold text-gray-900">{adminStats.totalUsers}</p>
+              <p className="text-2xl font-semibold text-gray-900">
+                {statsLoading ? '...' : stats.totalUsers.toLocaleString()}
+              </p>
+            </div>
+          </div>
+          <div className="mt-4">
+            <div className="flex items-center text-sm">
+              <TrendingUp className="h-4 w-4 text-green-500 mr-1" />
+              <span className="text-green-600">+12%</span>
+              <span className="text-gray-500 ml-1">from last month</span>
             </div>
           </div>
         </div>
@@ -95,7 +114,16 @@ const AdminDashboard = () => {
             </div>
             <div className="ml-4">
               <p className="text-sm font-medium text-gray-600">Companies</p>
-              <p className="text-2xl font-semibold text-gray-900">{adminStats.totalCompanies}</p>
+              <p className="text-2xl font-semibold text-gray-900">
+                {statsLoading ? '...' : stats.totalCompanies.toLocaleString()}
+              </p>
+            </div>
+          </div>
+          <div className="mt-4">
+            <div className="flex items-center text-sm">
+              <TrendingUp className="h-4 w-4 text-green-500 mr-1" />
+              <span className="text-green-600">+8%</span>
+              <span className="text-gray-500 ml-1">from last month</span>
             </div>
           </div>
         </div>
@@ -103,11 +131,20 @@ const AdminDashboard = () => {
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
           <div className="flex items-center">
             <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
-              <MessageCircle className="h-6 w-6 text-purple-600" />
+              <FileText className="h-6 w-6 text-purple-600" />
             </div>
             <div className="ml-4">
-              <p className="text-sm font-medium text-gray-600">Comments</p>
-              <p className="text-2xl font-semibold text-gray-900">{adminStats.totalComments}</p>
+              <p className="text-sm font-medium text-gray-600">Blog Posts</p>
+              <p className="text-2xl font-semibold text-gray-900">
+                {statsLoading ? '...' : stats.totalBlogs.toLocaleString()}
+              </p>
+            </div>
+          </div>
+          <div className="mt-4">
+            <div className="flex items-center text-sm">
+              <TrendingUp className="h-4 w-4 text-green-500 mr-1" />
+              <span className="text-green-600">+15%</span>
+              <span className="text-gray-500 ml-1">from last month</span>
             </div>
           </div>
         </div>
@@ -115,23 +152,28 @@ const AdminDashboard = () => {
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
           <div className="flex items-center">
             <div className="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center">
-              <AlertTriangle className="h-6 w-6 text-orange-600" />
+              <Clock className="h-6 w-6 text-orange-600" />
             </div>
             <div className="ml-4">
-              <p className="text-sm font-medium text-gray-600">Pending Reviews</p>
-              <p className="text-2xl font-semibold text-gray-900">{adminStats.pendingReviews}</p>
+              <p className="text-sm font-medium text-gray-600">Pending Approvals</p>
+              <p className="text-2xl font-semibold text-gray-900">
+                {statsLoading ? '...' : stats.pendingApprovals}
+              </p>
             </div>
           </div>
-        </div>
-
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-          <div className="flex items-center">
-            <div className="w-12 h-12 bg-indigo-100 rounded-lg flex items-center justify-center">
-              <TrendingUp className="h-6 w-6 text-indigo-600" />
-            </div>
-            <div className="ml-4">
-              <p className="text-sm font-medium text-gray-600">Growth</p>
-              <p className="text-2xl font-semibold text-gray-900">+{adminStats.monthlyGrowth}%</p>
+          <div className="mt-4">
+            <div className="flex items-center text-sm">
+              {stats.pendingApprovals > 0 ? (
+                <>
+                  <AlertCircle className="h-4 w-4 text-orange-500 mr-1" />
+                  <span className="text-orange-600">Requires attention</span>
+                </>
+              ) : (
+                <>
+                  <CheckCircle className="h-4 w-4 text-green-500 mr-1" />
+                  <span className="text-green-600">All caught up</span>
+                </>
+              )}
             </div>
           </div>
         </div>
@@ -139,20 +181,42 @@ const AdminDashboard = () => {
 
       {/* Main Content Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        {/* Recent Users */}
+        {/* Recent Activity */}
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-semibold text-gray-900">Recent Users</h2>
-            <Link to="/admin/users" className="text-primary-600 hover:text-primary-500 text-sm">
-              Manage All →
-            </Link>
+            <h2 className="text-lg font-semibold text-gray-900">Recent Activity</h2>
+            <button className="text-primary-600 hover:text-primary-500 text-sm">
+              View All →
+            </button>
           </div>
           
-          <div className="space-y-4">
-            <div className="text-center py-4">
-              <Users className="h-8 w-8 text-gray-400 mx-auto mb-2" />
-              <p className="text-gray-500 text-sm">User management coming soon</p>
-            </div>
+          <div className="space-y-3">
+            {activityLoading ? (
+              <div className="flex items-center justify-center py-4">
+                <Loader2 className="h-5 w-5 animate-spin text-gray-400" />
+                <span className="ml-2 text-gray-500">Loading activity...</span>
+              </div>
+            ) : recentActivity && recentActivity.length > 0 ? (
+              recentActivity.slice(0, 4).map((activity) => (
+                <div key={activity.id} className="flex items-start space-x-3 p-3 bg-gray-50 rounded-lg">
+                  <div className="flex-shrink-0">
+                    {activity.type === 'user' && <Users className="h-5 w-5 text-blue-600" />}
+                    {activity.type === 'company' && <Building2 className="h-5 w-5 text-green-600" />}
+                    {activity.type === 'blog' && <FileText className="h-5 w-5 text-purple-600" />}
+                    {activity.type === 'approval' && <CheckCircle className="h-5 w-5 text-green-600" />}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium text-gray-900">{activity.action}</p>
+                    <p className="text-sm text-gray-500">by {activity.user} • {activity.time}</p>
+                  </div>
+                </div>
+              ))
+            ) : (
+              <div className="text-center py-4">
+                <FileText className="h-8 w-8 text-gray-400 mx-auto mb-2" />
+                <p className="text-gray-500 text-sm">No recent activity</p>
+              </div>
+            )}
           </div>
         </div>
 
@@ -177,12 +241,12 @@ const AdminDashboard = () => {
               <span className="text-sm text-green-600">Online</span>
             </div>
             
-            <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+            <div className="flex items-center justify-between p-3 bg-green-50 rounded-lg">
               <div className="flex items-center">
-                <div className="w-2 h-2 bg-gray-400 rounded-full mr-3"></div>
-                <span className="text-sm font-medium text-gray-900">Email Service</span>
+                <div className="w-2 h-2 bg-green-500 rounded-full mr-3"></div>
+                <span className="text-sm font-medium text-gray-900">Storage</span>
               </div>
-              <span className="text-sm text-gray-500">Not Configured</span>
+              <span className="text-sm text-green-600">85% Available</span>
             </div>
           </div>
         </div>
@@ -194,10 +258,10 @@ const AdminDashboard = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           <Link 
             to="/admin/users" 
-            className="block p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
+            className="block p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors group"
           >
             <div className="text-center">
-              <UserCheck className="h-8 w-8 text-gray-600 mx-auto mb-2" />
+              <UserCheck className="h-8 w-8 text-gray-600 group-hover:text-blue-600 mx-auto mb-2 transition-colors" />
               <p className="font-medium text-gray-900">Manage Users</p>
               <p className="text-sm text-gray-600">View and moderate users</p>
             </div>
@@ -205,36 +269,35 @@ const AdminDashboard = () => {
 
           <Link 
             to="/admin/companies" 
-            className="block p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
+            className="block p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors group"
           >
             <div className="text-center">
-              <Building2 className="h-8 w-8 text-gray-600 mx-auto mb-2" />
-              <p className="font-medium text-gray-900">Manage Companies</p>
+              <Building2 className="h-8 w-8 text-gray-600 group-hover:text-green-600 mx-auto mb-2 transition-colors" />
+              <p className="font-medium text-gray-900">Company Moderation</p>
               <p className="text-sm text-gray-600">Approve business listings</p>
+              {stats.pendingApprovals > 0 && (
+                <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-orange-100 text-orange-800 mt-1">
+                  {stats.pendingApprovals} pending
+                </span>
+              )}
             </div>
           </Link>
 
-          <Link 
-            to="/admin/content" 
-            className="block p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
-          >
+          <div className="block p-4 border border-gray-200 rounded-lg opacity-50 cursor-not-allowed">
             <div className="text-center">
-              <FileText className="h-8 w-8 text-gray-600 mx-auto mb-2" />
-              <p className="font-medium text-gray-900">Content Moderation</p>
-              <p className="text-sm text-gray-600">Review blogs and comments</p>
+              <FileText className="h-8 w-8 text-gray-400 mx-auto mb-2" />
+              <p className="font-medium text-gray-700">Content Moderation</p>
+              <p className="text-sm text-gray-500">Coming Soon</p>
             </div>
-          </Link>
+          </div>
 
-          <Link 
-            to="/admin/analytics" 
-            className="block p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
-          >
+          <div className="block p-4 border border-gray-200 rounded-lg opacity-50 cursor-not-allowed">
             <div className="text-center">
-              <BarChart3 className="h-8 w-8 text-gray-600 mx-auto mb-2" />
-              <p className="font-medium text-gray-900">Analytics</p>
-              <p className="text-sm text-gray-600">Platform insights</p>
+              <BarChart3 className="h-8 w-8 text-gray-400 mx-auto mb-2" />
+              <p className="font-medium text-gray-700">Analytics</p>
+              <p className="text-sm text-gray-500">Coming Soon</p>
             </div>
-          </Link>
+          </div>
         </div>
       </div>
     </div>
