@@ -37,5 +37,11 @@ export const companyService = {
       params: { search: query }
     })
     return response.data
+  },
+
+  // Get owner's companies (authenticated)
+  getMyCompanies: async () => {
+    const response = await api.get('/my-companies')
+    return response.data
   }
 }

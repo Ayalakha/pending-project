@@ -1,5 +1,6 @@
 import { useAuth } from '../../contexts/AuthContext'
 import { useQuery } from '@tanstack/react-query'
+import { companyService } from '../../services/companyService'
 import { 
   Building2, 
   Users, 
@@ -24,11 +25,12 @@ const OwnerDashboard = () => {
   }, isLoading } = useQuery({
     queryKey: ['ownerStats'],
     queryFn: async () => {
-      // Placeholder for company stats API
+      // Get real company data
+      const companiesData = await companyService.getMyCompanies()
       return {
-        companies: 0,
-        totalViews: 0,
-        monthlyGrowth: 0
+        companies: companiesData?.companies?.length || 0,
+        totalViews: 0, // TODO: Implement view tracking
+        monthlyGrowth: 0 // TODO: Implement growth calculation
       }
     }
   })
@@ -126,7 +128,7 @@ const OwnerDashboard = () => {
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-lg font-semibold text-gray-900">My Businesses</h2>
-            <Link to="/companies" className="text-primary-600 hover:text-primary-500 text-sm">
+            <Link to="/my-companies" className="text-primary-600 hover:text-primary-500 text-sm">
               View All →
             </Link>
           </div>
@@ -166,7 +168,7 @@ const OwnerDashboard = () => {
             </Link>
 
             <Link 
-              to="/companies" 
+              to="/my-companies" 
               className="block p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
             >
               <div className="flex items-center">
@@ -178,18 +180,15 @@ const OwnerDashboard = () => {
               </div>
             </Link>
 
-            <Link 
-              to="/analytics" 
-              className="block p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
-            >
+            <div className="block p-4 border border-gray-200 rounded-lg bg-gray-50 transition-colors">
               <div className="flex items-center">
-                <BarChart3 className="h-5 w-5 text-gray-600 mr-3" />
+                <BarChart3 className="h-5 w-5 text-gray-400 mr-3" />
                 <div>
-                  <p className="font-medium text-gray-900">View Analytics</p>
-                  <p className="text-sm text-gray-600">Track your business performance</p>
+                  <p className="font-medium text-gray-600">View Analytics</p>
+                  <p className="text-sm text-gray-500">Coming Soon</p>
                 </div>
               </div>
-            </Link>
+            </div>
 
             <Link 
               to="/profile" 

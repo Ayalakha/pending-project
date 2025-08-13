@@ -6,6 +6,8 @@ import Footer from './components/layout/Footer'
 import HomePage from './pages/HomePage'
 import CompaniesPage from './pages/CompaniesPage'
 import CompanyDetailPage from './pages/CompanyDetailPage'
+import MyCompaniesPage from './pages/MyCompaniesPage'
+import CompanyFormPage from './pages/CompanyFormPage'
 import BlogsPage from './pages/BlogsPage'
 import BlogDetailPage from './pages/BlogDetailPage'
 import DashboardPage from './pages/DashboardPage'
@@ -36,6 +38,9 @@ function App() {
                 <Route path="/" element={<HomePage />} />
                 <Route path="/companies" element={<CompaniesPage />} />
                 <Route path="/companies/:id" element={<CompanyDetailPage />} />
+                <Route path="/my-companies" element={<MyCompaniesPage />} />
+                <Route path="/companies/new" element={<CompanyFormPage />} />
+                <Route path="/companies/:id/edit" element={<CompanyFormPage />} />
                 <Route path="/blogs" element={<BlogsPage />} />
                 <Route path="/blogs/:id" element={<BlogDetailPage />} />
                 <Route path="/dashboard" element={<DashboardPage />} />
