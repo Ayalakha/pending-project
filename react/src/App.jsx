@@ -16,6 +16,7 @@ import LoginPage from './pages/auth/LoginPage'
 import RegisterPage from './pages/auth/RegisterPage'
 import UserManagementPage from './pages/admin/UserManagementPage'
 import CompanyModerationPage from './pages/admin/CompanyModerationPage'
+import AnalyticsDashboard from './pages/admin/AnalyticsDashboard'
 
 // Create a client for React Query
 const queryClient = new QueryClient({
@@ -49,6 +50,7 @@ function App() {
                 <Route path="/profile" element={<ProfilePage />} />
                 <Route path="/admin/users" element={<UserManagementPage />} />
                 <Route path="/admin/companies" element={<CompanyModerationPage />} />
+                <Route path="/admin/analytics" element={<AnalyticsDashboard />} />
                 <Route path="/login" element={<LoginPage />} />
                 <Route path="/register" element={<RegisterPage />} />
               </Routes>

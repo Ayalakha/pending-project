@@ -291,13 +291,16 @@ const AdminDashboard = () => {
             </div>
           </div>
 
-          <div className="block p-4 border border-gray-200 rounded-lg opacity-50 cursor-not-allowed">
+          <Link 
+            to="/admin/analytics" 
+            className="block p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors group"
+          >
             <div className="text-center">
-              <BarChart3 className="h-8 w-8 text-gray-400 mx-auto mb-2" />
-              <p className="font-medium text-gray-700">Analytics</p>
-              <p className="text-sm text-gray-500">Coming Soon</p>
+              <BarChart3 className="h-8 w-8 text-gray-600 group-hover:text-indigo-600 mx-auto mb-2 transition-colors" />
+              <p className="font-medium text-gray-900">Analytics Dashboard</p>
+              <p className="text-sm text-gray-600">Platform insights</p>
             </div>
-          </div>
+          </Link>
         </div>
       </div>
     </div>
