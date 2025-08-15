@@ -6,65 +6,65 @@ const HomePage = () => {
   const [searchQuery, setSearchQuery] = useState('')
 
   const stats = [
-    { 
-      label: 'Verified Companies', 
-      value: '6+', 
+    {
+      label: 'Verified Companies',
+      value: '6+',
       icon: Building2,
       description: 'Thoroughly vetted businesses'
     },
-    { 
-      label: 'Service Categories', 
-      value: '18+', 
+    {
+      label: 'Service Categories',
+      value: '18+',
       icon: TrendingUp,
       description: 'Diverse professional services'
     },
-    { 
-      label: 'Satisfied Users', 
-      value: '100+', 
+    {
+      label: 'Satisfied Users',
+      value: '100+',
       icon: Users,
       description: 'Growing trusted community'
     },
   ]
 
   const categories = [
-    { 
-      name: 'Technology & IT', 
-      count: 2, 
+    {
+      name: 'Technology & IT',
+      count: 2,
       color: 'from-blue-500 to-indigo-600',
       description: 'Software development & IT consulting',
       icon: '💻'
     },
-    { 
-      name: 'Business Consulting', 
-      count: 2, 
+    {
+      name: 'Business Consulting',
+      count: 2,
       color: 'from-emerald-500 to-teal-600',
       description: 'Strategic planning & optimization',
       icon: '📊'
     },
-    { 
-      name: 'Marketing & Advertising', 
-      count: 1, 
+    {
+      name: 'Marketing & Advertising',
+      count: 1,
       color: 'from-purple-500 to-violet-600',
       description: 'Digital marketing & branding',
       icon: '📈'
     },
-    { 
-      name: 'Healthcare & Wellness', 
-      count: 1, 
+    {
+      name: 'Healthcare & Wellness',
+      count: 1,
       color: 'from-rose-500 to-pink-600',
       description: 'Medical & wellness services',
       icon: '🏥'
     },
-    { 
-      name: 'Architecture & Design', 
-      count: 1, 
+    {
+      name: 'Architecture & Design',
+      count: 1,
       color: 'from-amber-500 to-orange-600',
       description: 'Architectural & design services',
       icon: '🏗️'
     },
-    { 
-      name: 'Food & Hospitality', 
-      count: 1, 
+    {
+      name: 'Food & Hospitality',
+      count: 1,
       color: 'from-orange-500 to-red-600',
       description: 'Catering & event planning',
       icon: '🍽️'
@@ -133,7 +133,7 @@ const HomePage = () => {
           <div className="absolute top-0 left-0 w-72 h-72 bg-blue-500/10 rounded-full blur-3xl"></div>
           <div className="absolute bottom-0 right-0 w-96 h-96 bg-indigo-500/10 rounded-full blur-3xl"></div>
         </div>
-        
+
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-32 lg:py-40">
           <div className="text-center space-y-8">
             {/* Badge */}
@@ -215,7 +215,7 @@ const HomePage = () => {
               Join thousands of businesses that have found their perfect partners through our platform.
             </p>
           </div>
-          
+
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {stats.map((stat, index) => {
               const Icon = stat.icon
@@ -333,11 +333,11 @@ const HomePage = () => {
                     <Star key={i} className="w-4 h-4 text-yellow-400 fill-current" />
                   ))}
                 </div>
-                
+
                 <blockquote className="text-gray-200 mb-6 italic">
                   "{testimonial.content}"
                 </blockquote>
-                
+
                 <div className="flex items-center">
                   <div className="text-2xl mr-3">{testimonial.avatar}</div>
                   <div>
@@ -364,28 +364,29 @@ const HomePage = () => {
             <Briefcase className="w-4 h-4" />
             <span>Join Our Network</span>
           </div>
-          
+
           <h2 className="text-4xl md:text-6xl font-bold mb-6">
             Ready to Find Your
             <span className="block text-blue-100">Perfect Partner?</span>
           </h2>
-          
+
           <p className="text-xl text-blue-100 mb-12 max-w-3xl mx-auto">
             Join our exclusive network of verified professionals and start building meaningful business relationships today.
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-12">
-            <Link 
-              to="/companies" 
+            <Link
+              to="/companies"
               className="group bg-white text-blue-600 hover:bg-blue-50 px-8 py-4 rounded-xl font-semibold text-lg transition-all duration-300 hover:scale-105 flex items-center space-x-2"
             >
               <span>Explore Businesses</span>
               <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform duration-300" />
             </Link>
-            <Link 
-              to="/register" 
-              className="group bg-transparent border-2 border-white text-white hover:bg-white hover:text-blue-600 px-8 py-4 rounded-xl font-semibold text-lg transition-all duration-300 hover:scale-105 flex items-center space-x-2"
-            >
+            <Link
+              to="/register"
+             className="bg-white/10 text-white hover:bg-white/20 px-8 py-4 rounded-xl font-semibold text-lg transition-colors duration-300 flex items-center space-x-2"
+>
+
               <Building2 className="w-5 h-5" />
               <span>List Your Business</span>
             </Link>

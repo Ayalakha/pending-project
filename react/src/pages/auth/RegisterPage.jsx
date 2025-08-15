@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../../contexts/AuthContext'
-import { Mail, Lock, Eye, EyeOff, Loader2, Building2, User, Users } from 'lucide-react'
+import { Mail, Lock, Eye, EyeOff, Loader2, Building2, User, Users, ArrowRight, Shield, CheckCircle } from 'lucide-react'
 
 const RegisterPage = () => {
   const navigate = useNavigate()
@@ -117,38 +117,41 @@ const RegisterPage = () => {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 bg-gray-50">
-      <div className="max-w-md w-full space-y-8">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-md w-full">
         {/* Header */}
-        <div className="text-center">
-          <Link to="/" className="inline-flex items-center space-x-2 mb-6">
-            <Building2 className="h-8 w-8 text-primary-600" />
-            <span className="text-xl font-bold text-gray-900">Business Directory</span>
+        <div className="text-center mb-12">
+          <Link to="/" className="inline-flex items-center space-x-3 mb-8 group">
+            <div className="w-12 h-12 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-2xl flex items-center justify-center group-hover:scale-105 transition-transform duration-300">
+              <Building2 className="h-6 w-6 text-white" />
+            </div>
+            <span className="text-2xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">BizDirectory</span>
           </Link>
-          <h2 className="text-3xl font-bold text-gray-900 mb-2">
+          
+          <h2 className="text-4xl font-bold text-gray-900 mb-4">
             Create your account
           </h2>
-          <p className="text-gray-600">
+          <p className="text-lg text-gray-600">
             Join our business directory platform
           </p>
         </div>
 
         {/* Register Form */}
-        <div className="card">
+        <div className="bg-white/80 backdrop-blur-sm rounded-3xl p-8 border border-gray-100/50 shadow-xl">
           {errors.general && (
-            <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg">
-              <p className="text-sm text-red-600">{errors.general}</p>
+            <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-2xl">
+              <p className="text-sm text-red-600 font-medium">{errors.general}</p>
             </div>
           )}
 
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* Username Field */}
             <div>
-              <label htmlFor="username" className="block text-sm font-medium text-gray-700 mb-2">
+              <label htmlFor="username" className="block text-sm font-semibold text-gray-700 mb-3">
                 Username
               </label>
               <div className="relative">
-                <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
+                <User className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
                 <input
                   id="username"
                   name="username"
@@ -157,24 +160,24 @@ const RegisterPage = () => {
                   required
                   value={formData.username}
                   onChange={handleChange}
-                  className={`w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none transition-colors ${
-                    errors.username ? 'border-red-300' : 'border-gray-300'
+                  className={`w-full pl-12 pr-4 py-4 border rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all duration-300 bg-gray-50/50 hover:bg-white text-lg ${
+                    errors.username ? 'border-red-300' : 'border-gray-200'
                   }`}
                   placeholder="Enter your username"
                 />
               </div>
               {errors.username && (
-                <p className="mt-1 text-sm text-red-600">{errors.username}</p>
+                <p className="mt-2 text-sm text-red-600 font-medium">{errors.username}</p>
               )}
             </div>
 
             {/* Email Field */}
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
+              <label htmlFor="email" className="block text-sm font-semibold text-gray-700 mb-3">
                 Email Address
               </label>
               <div className="relative">
-                <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
+                <Mail className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
                 <input
                   id="email"
                   name="email"
@@ -183,30 +186,30 @@ const RegisterPage = () => {
                   required
                   value={formData.email}
                   onChange={handleChange}
-                  className={`w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none transition-colors ${
-                    errors.email ? 'border-red-300' : 'border-gray-300'
+                  className={`w-full pl-12 pr-4 py-4 border rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all duration-300 bg-gray-50/50 hover:bg-white text-lg ${
+                    errors.email ? 'border-red-300' : 'border-gray-200'
                   }`}
                   placeholder="Enter your email"
                 />
               </div>
               {errors.email && (
-                <p className="mt-1 text-sm text-red-600">{errors.email}</p>
+                <p className="mt-2 text-sm text-red-600 font-medium">{errors.email}</p>
               )}
             </div>
 
             {/* Role Selection */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-3">
+              <label className="block text-sm font-semibold text-gray-700 mb-4">
                 Account Type
               </label>
               <div className="space-y-3">
                 {roles.map((role) => (
                   <label
                     key={role.value}
-                    className={`flex items-start p-3 border rounded-lg cursor-pointer transition-colors ${
+                    className={`flex items-start p-4 border rounded-2xl cursor-pointer transition-all duration-300 hover:shadow-md ${
                       formData.role === role.value
-                        ? 'border-primary-500 bg-primary-50'
-                        : 'border-gray-300 hover:border-gray-400'
+                        ? 'border-blue-500 bg-blue-50/50'
+                        : 'border-gray-200 hover:border-gray-300'
                     }`}
                   >
                     <input
@@ -215,20 +218,20 @@ const RegisterPage = () => {
                       value={role.value}
                       checked={formData.role === role.value}
                       onChange={handleChange}
-                      className="mt-1 h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300"
+                      className="mt-1 h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300"
                     />
-                    <div className="ml-3">
+                    <div className="ml-4">
                       <div className="flex items-center">
                         {role.value === 'owner' ? (
-                          <Building2 className="h-4 w-4 mr-2 text-gray-600" />
+                          <Building2 className="h-5 w-5 mr-2 text-blue-600" />
                         ) : (
-                          <Users className="h-4 w-4 mr-2 text-gray-600" />
+                          <Users className="h-5 w-5 mr-2 text-emerald-600" />
                         )}
-                        <span className="text-sm font-medium text-gray-900">
+                        <span className="text-base font-semibold text-gray-900">
                           {role.label}
                         </span>
                       </div>
-                      <p className="text-sm text-gray-600">{role.description}</p>
+                      <p className="text-sm text-gray-600 mt-1">{role.description}</p>
                     </div>
                   </label>
                 ))}
@@ -237,11 +240,11 @@ const RegisterPage = () => {
 
             {/* Password Field */}
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
+              <label htmlFor="password" className="block text-sm font-semibold text-gray-700 mb-3">
                 Password
               </label>
               <div className="relative">
-                <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
+                <Lock className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
                 <input
                   id="password"
                   name="password"
@@ -250,15 +253,15 @@ const RegisterPage = () => {
                   required
                   value={formData.password}
                   onChange={handleChange}
-                  className={`w-full pl-10 pr-12 py-3 border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none transition-colors ${
-                    errors.password ? 'border-red-300' : 'border-gray-300'
+                  className={`w-full pl-12 pr-12 py-4 border rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all duration-300 bg-gray-50/50 hover:bg-white text-lg ${
+                    errors.password ? 'border-red-300' : 'border-gray-200'
                   }`}
                   placeholder="Enter your password"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                  className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors duration-200 bg-transparent border-none outline-none focus:outline-none"
                 >
                   {showPassword ? (
                     <EyeOff className="h-5 w-5" />
@@ -268,17 +271,17 @@ const RegisterPage = () => {
                 </button>
               </div>
               {errors.password && (
-                <p className="mt-1 text-sm text-red-600">{errors.password}</p>
+                <p className="mt-2 text-sm text-red-600 font-medium">{errors.password}</p>
               )}
             </div>
 
             {/* Confirm Password Field */}
             <div>
-              <label htmlFor="password_confirmation" className="block text-sm font-medium text-gray-700 mb-2">
+              <label htmlFor="password_confirmation" className="block text-sm font-semibold text-gray-700 mb-3">
                 Confirm Password
               </label>
               <div className="relative">
-                <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
+                <Lock className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
                 <input
                   id="password_confirmation"
                   name="password_confirmation"
@@ -287,15 +290,15 @@ const RegisterPage = () => {
                   required
                   value={formData.password_confirmation}
                   onChange={handleChange}
-                  className={`w-full pl-10 pr-12 py-3 border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none transition-colors ${
-                    errors.password_confirmation ? 'border-red-300' : 'border-gray-300'
+                  className={`w-full pl-12 pr-12 py-4 border rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all duration-300 bg-gray-50/50 hover:bg-white text-lg ${
+                    errors.password_confirmation ? 'border-red-300' : 'border-gray-200'
                   }`}
                   placeholder="Confirm your password"
                 />
                 <button
                   type="button"
                   onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                  className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors duration-200 bg-transparent border-none outline-none focus:outline-none"
                 >
                   {showConfirmPassword ? (
                     <EyeOff className="h-5 w-5" />
@@ -305,26 +308,26 @@ const RegisterPage = () => {
                 </button>
               </div>
               {errors.password_confirmation && (
-                <p className="mt-1 text-sm text-red-600">{errors.password_confirmation}</p>
+                <p className="mt-2 text-sm text-red-600 font-medium">{errors.password_confirmation}</p>
               )}
             </div>
 
             {/* Terms and Conditions */}
-            <div className="flex items-start">
+            <div className="flex items-start p-4 bg-gray-50/50 rounded-xl border border-gray-100">
               <input
                 id="terms"
                 name="terms"
                 type="checkbox"
                 required
-                className="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded mt-1"
+                className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded mt-1"
               />
-              <label htmlFor="terms" className="ml-2 block text-sm text-gray-700">
+              <label htmlFor="terms" className="ml-3 block text-sm text-gray-700">
                 I agree to the{' '}
-                <Link to="/terms" className="text-primary-600 hover:text-primary-700 font-medium">
+                <Link to="/terms" className="text-blue-600 hover:text-blue-700 font-semibold">
                   Terms of Service
                 </Link>{' '}
                 and{' '}
-                <Link to="/privacy" className="text-primary-600 hover:text-primary-700 font-medium">
+                <Link to="/privacy" className="text-blue-600 hover:text-blue-700 font-semibold">
                   Privacy Policy
                 </Link>
               </label>
@@ -334,27 +337,30 @@ const RegisterPage = () => {
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full btn-primary py-3 text-base font-medium disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
+              className="group w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white py-4 rounded-xl font-semibold text-lg transition-all duration-300 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 flex items-center justify-center"
             >
               {isLoading ? (
                 <>
-                  <Loader2 className="animate-spin h-5 w-5 mr-2" />
+                  <Loader2 className="animate-spin h-5 w-5 mr-3" />
                   Creating account...
                 </>
               ) : (
-                'Create account'
+                <>
+                  <span>Create account</span>
+                  <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform duration-300" />
+                </>
               )}
             </button>
           </form>
         </div>
 
         {/* Login Link */}
-        <div className="text-center">
+        <div className="text-center mt-8">
           <p className="text-gray-600">
             Already have an account?{' '}
             <Link 
               to="/login" 
-              className="text-primary-600 hover:text-primary-700 font-medium"
+              className="text-blue-600 hover:text-blue-700 font-semibold transition-colors duration-200"
             >
               Sign in here
             </Link>

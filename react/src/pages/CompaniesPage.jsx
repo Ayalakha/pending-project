@@ -179,87 +179,66 @@ const CompaniesPage = () => {
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 via-white to-gray-50">
       {/* Hero Header Section */}
-      <section className="relative bg-gradient-to-b from-gray-900 via-gray-800 to-gray-600 text-white overflow-hidden">
-        {/* Background Elements */}
-        <div className="absolute inset-0">
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_40%,rgba(120,119,198,0.1),transparent_70%),radial-gradient(circle_at_80%_80%,rgba(255,255,255,0.05),transparent_70%)]"></div>
-          <div className="absolute top-0 left-0 w-72 h-72 bg-blue-500/10 rounded-full blur-3xl"></div>
-          <div className="absolute bottom-0 right-0 w-96 h-96 bg-indigo-500/10 rounded-full blur-3xl"></div>
-        </div>
-
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24">
+      <section className="relative bg-gradient-to-b from-white to-gray-50 border-b border-gray-100">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
           <div className="text-center mb-12">
-            {/* Badge */}
-            <div className="inline-flex items-center space-x-2 px-4 py-2 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-blue-200 text-sm font-medium mb-6">
+            {/* Simple Badge */}
+            <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-blue-50 text-blue-600 text-sm font-medium mb-8">
               <Building2 className="w-4 h-4" />
-              <span>{companies.length} Verified Companies</span>
+              <span>{companies.length} Companies</span>
             </div>
 
-            <h1 className="text-5xl md:text-6xl font-bold mb-6">
+            <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
               {searchQuery ? (
-                <span className="block">
-                  <span className="text-blue-200">Search Results for</span>
-                  <span className="block text-white">"{searchQuery}"</span>
-                </span>
+                <span>Search Results for "{searchQuery}"</span>
               ) : (
-                <span className="block">
-                  <span className="text-blue-200">Discover Amazing</span>
-                  <span className="block text-white">Businesses</span>
-                </span>
+                <span>Business Directory</span>
               )}
             </h1>
             
-            <p className="text-xl text-gray-300 mb-12 max-w-3xl mx-auto">
+            <p className="text-lg text-gray-600 mb-12 max-w-2xl mx-auto">
               {searchQuery 
-                ? `Found ${companies.length} companies matching your search criteria`
-                : 'Explore our curated directory of verified businesses and professional services'
+                ? `${companies.length} companies found`
+                : 'Discover verified businesses and professional services'
               }
             </p>
 
-            {/* Enhanced Search Bar */}
-            <form onSubmit={handleSearch} className="max-w-4xl mx-auto">
-              <div className="relative group">
-                <div className="absolute inset-0 bg-gradient-to-r from-blue-500/20 to-indigo-500/20 rounded-2xl blur-xl group-hover:blur-2xl transition-all duration-300"></div>
-                <div className="relative bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl p-2">
-                  <div className="flex items-center">
-                    <div className="flex-1 relative">
-                      <Search className="absolute left-6 top-1/2 transform -translate-y-1/2 text-white/60 h-6 w-6" />
-                      <input
-                        type="text"
-                        value={localSearch}
-                        onChange={(e) => setLocalSearch(e.target.value)}
-                        placeholder="Search companies by name, description, or services..."
-                        className="w-full pl-16 pr-16 py-5 bg-transparent text-white placeholder-white/60 text-lg focus:outline-none"
-                      />
-                      {localSearch && (
-                        <button
-                          type="button"
-                          onClick={clearSearch}
-                          className="absolute right-20 top-1/2 transform -translate-y-1/2 text-white/60 hover:text-white transition-colors duration-300"
-                        >
-                          <X className="h-5 w-5" />
-                        </button>
-                      )}
-                    </div>
-                    <button
-                      type="submit"
-                      className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white px-8 py-5 rounded-xl font-medium transition-all duration-300 hover:scale-105 flex items-center space-x-2"
-                    >
-                      <span>Search</span>
-                      <ArrowRight className="w-5 h-5" />
-                    </button>
-                  </div>
-                </div>
+            {/* Minimal Search Bar */}
+            <form onSubmit={handleSearch} className="max-w-2xl mx-auto">
+              <div className="relative">
+                <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
+                <input
+                  type="text"
+                  value={localSearch}
+                  onChange={(e) => setLocalSearch(e.target.value)}
+                  placeholder="Search companies..."
+                  className="w-full pl-12 pr-24 py-4 bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none text-lg shadow-sm"
+                />
+                {localSearch && (
+                  <button
+                    type="button"
+                    onClick={clearSearch}
+                    className="absolute right-16 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors duration-200"
+                  >
+                    <X className="h-5 w-5" />
+                  </button>
+                )}
+                <button
+                  type="submit"
+                  className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition-colors duration-200"
+                >
+                  Search
+                </button>
               </div>
             </form>
 
             {searchQuery && (
-              <div className="mt-8">
+              <div className="mt-6">
                 <button
                   onClick={clearSearch}
-                  className="inline-flex items-center px-4 py-2 bg-white/10 backdrop-blur-md border border-white/20 rounded-xl text-white hover:bg-white/20 transition-all duration-300"
+                  className="inline-flex items-center px-3 py-1 text-sm text-gray-600 hover:text-gray-900 transition-colors duration-200"
                 >
-                  <X className="h-4 w-4 mr-2" />
+                  <X className="h-4 w-4 mr-1" />
                   Clear search
                 </button>
               </div>
