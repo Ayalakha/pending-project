@@ -24,7 +24,6 @@ class DatabaseSeeder extends Seeder
 
         // Run seeders in order (due to foreign key dependencies)
         $this->call([
-            UserSeeder::class,
             CompanySeeder::class,
             ServiceOrProductSeeder::class,
             BlogSeeder::class,
