@@ -44,7 +44,7 @@ const Header = () => {
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
           <Link to="/" className="flex items-center space-x-2">
-            <Building2 className="h-8 w-8 text-primary-600" />
+            <Building2 className="h-8 w-8 text-blue-600" />
             <span className="text-xl font-bold text-gray-900">
               Business Directory
             </span>
@@ -60,7 +60,7 @@ const Header = () => {
                   to={item.href}
                   className={`flex items-center space-x-1 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
                     isActive(item.href)
-                      ? 'text-primary-600 bg-primary-50'
+                      ? 'text-blue-600 bg-blue-50'
                       : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
                   }`}
                 >
@@ -80,7 +80,7 @@ const Header = () => {
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Search companies..."
-                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none"
+                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
               />
             </form>
           </div>
@@ -91,7 +91,7 @@ const Header = () => {
               <div className="relative" ref={userMenuRef}>
                 <button
                   onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
-                  className="flex items-center space-x-2 text-gray-700 hover:text-gray-900 px-3 py-2 rounded-lg hover:bg-gray-50 transition-colors"
+                  className="flex items-center space-x-2 text-blue-600 hover:text-blue-700 px-3 py-2 rounded-lg hover:bg-blue-50 transition-colors"
                 >
                   <User className="h-5 w-5" />
                   <span className="text-sm font-medium">{user?.username}</span>
@@ -103,7 +103,7 @@ const Header = () => {
                     <div className="px-4 py-2 border-b border-gray-200">
                       <p className="text-sm font-medium text-gray-900">{user?.username}</p>
                       <p className="text-sm text-gray-600">{user?.email}</p>
-                      <span className="inline-block px-2 py-1 text-xs font-medium bg-primary-100 text-primary-800 rounded-full mt-1">
+                      <span className="inline-block px-2 py-1 text-xs font-medium bg-blue-100 text-blue-800 rounded-full mt-1">
                         {user?.role}
                       </span>
                     </div>
@@ -125,7 +125,7 @@ const Header = () => {
                     </Link>
                     <button
                       onClick={handleLogout}
-                      className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                      className="flex items-center w-full px-4 py-2 text-sm text-blue-600 hover:text-blue-700 transition-colors duration-200 underline-offset-4 "
                     >
                       <LogOut className="h-4 w-4 mr-2" />
                       Sign Out
@@ -177,7 +177,7 @@ const Header = () => {
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     placeholder="Search companies..."
-                    className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none"
+                    className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
                   />
                 </form>
               </div>
@@ -192,7 +192,7 @@ const Header = () => {
                     onClick={() => setIsMenuOpen(false)}
                     className={`flex items-center space-x-2 px-4 py-3 text-base font-medium rounded-lg ${
                       isActive(item.href)
-                        ? 'text-primary-600 bg-primary-50'
+                        ? 'text-blue-600 bg-blue-50'
                         : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
                     }`}
                   >
@@ -209,7 +209,7 @@ const Header = () => {
                     <div className="px-4 py-3 bg-gray-50 rounded-lg mx-2">
                       <p className="text-sm font-medium text-gray-900">{user?.username}</p>
                       <p className="text-sm text-gray-600">{user?.email}</p>
-                      <span className="inline-block px-2 py-1 text-xs font-medium bg-primary-100 text-primary-800 rounded-full mt-1">
+                      <span className="inline-block px-2 py-1 text-xs font-medium bg-blue-100 text-blue-800 rounded-full mt-1">
                         {user?.role}
                       </span>
                     </div>

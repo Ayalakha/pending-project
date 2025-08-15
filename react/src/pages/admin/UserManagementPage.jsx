@@ -20,40 +20,95 @@ import {
 } from 'lucide-react'
 import { Navigate } from 'react-router-dom'
 
-const UserRow = ({ user, onUpdate }) => {
-  const [isMenuOpen, setIsMenuOpen] = useState(false)
-  const queryClient = useQueryClient()
-
-  const updateRoleMutation = useMutation({
-    mutationFn: ({ userId, role }) => adminService.updateUserRole(userId, role),
-    onSuccess: () => {
-      queryClient.invalidateQueries(['adminUsers'])
-      onUpdate()
-    }
-  })
-
-  const deleteUserMutation = useMutation({
-    mutationFn: (userId) => adminService.deleteUser(userId),
-    onSuccess: () => {
-      queryClient.invalidateQueries(['adminUsers'])
-      onUpdate()
-    }
-  })
+// Modal Component
+const UserActionModal = ({ isOpen, onClose, user, onRoleChange, onDelete, isUpdating, isDeleting }) => {
+  if (!isOpen) return null
 
   const handleRoleChange = (newRole) => {
     if (window.confirm(`Change ${user.username}'s role to ${newRole}?`)) {
-      updateRoleMutation.mutate({ userId: user.id, role: newRole })
+      onRoleChange(newRole)
     }
-    setIsMenuOpen(false)
   }
 
   const handleDelete = () => {
     if (window.confirm(`Are you sure you want to delete user "${user.username}"? This action cannot be undone.`)) {
-      deleteUserMutation.mutate(user.id)
+      onDelete()
     }
-    setIsMenuOpen(false)
   }
 
+  return (
+    <div className="fixed inset-0 z-50 overflow-y-auto">
+      {/* Backdrop with light blur */}
+      <div className="fixed inset-0 bg-black bg-opacity-30 backdrop-blur-[2px] transition-opacity" onClick={onClose}></div>
+      
+      {/* Modal */}
+      <div className="flex min-h-full items-center justify-center p-4">
+        <div className="relative bg-white rounded-xl shadow-xl max-w-md w-full p-6 transform transition-all">
+          {/* Header */}
+          <div className="flex items-center justify-between mb-6">
+            <h3 className="text-lg font-semibold text-gray-900">User Actions</h3>
+            <button
+              onClick={onClose}
+              className="text-gray-400 hover:text-gray-600 p-1 rounded-lg hover:bg-gray-100 transition-colors"
+            >
+              <X className="h-5 w-5" />
+            </button>
+          </div>
+
+          {/* User Info */}
+          <div className="flex items-center mb-6 p-4 bg-gray-50 rounded-lg">
+            <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
+              <Users className="h-5 w-5 text-blue-600" />
+            </div>
+            <div className="ml-3">
+              <div className="text-sm font-medium text-gray-900">{user.username}</div>
+              <div className="text-sm text-gray-500">{user.email}</div>
+            </div>
+          </div>
+
+          {/* Actions */}
+          <div className="space-y-4">
+            <div>
+              <h4 className="text-sm font-medium text-gray-700 mb-3">Change Role</h4>
+              <div className="space-y-2">
+                {['user', 'owner', 'superAdmin'].map((role) => (
+                  <button
+                    key={role}
+                    onClick={() => handleRoleChange(role)}
+                    disabled={user.role === role || isUpdating}
+                    className={`w-full text-left px-4 py-3 rounded-lg text-sm font-medium transition-colors ${
+                      user.role === role
+                        ? 'bg-blue-50 text-blue-700 border border-blue-200'
+                        : 'bg-white border border-gray-200 text-gray-700 hover:bg-gray-50'
+                    } disabled:opacity-50 disabled:cursor-not-allowed`}
+                  >
+                    {role === 'superAdmin' ? 'Super Admin' : role.charAt(0).toUpperCase() + role.slice(1)}
+                    {user.role === role && ' (Current)'}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Delete Section */}
+            <div className="pt-4 border-t border-gray-200">
+              <h4 className="text-sm font-medium text-gray-700 mb-3">Danger Zone</h4>
+              <button
+                onClick={handleDelete}
+                disabled={isDeleting}
+                className="w-full flex items-center justify-center px-4 py-3 bg-red-50 border border-red-200 rounded-lg text-sm font-medium text-red-700 hover:bg-red-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                <Trash2 className="h-4 w-4 mr-2" />
+                Delete User
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+const UserRow = ({ user, onOpenModal }) => {
   const getRoleBadge = (role) => {
     const badges = {
       superAdmin: { color: 'bg-red-100 text-red-800', icon: Crown, label: 'Super Admin' },
@@ -83,8 +138,8 @@ const UserRow = ({ user, onUpdate }) => {
     <tr className="hover:bg-gray-50">
       <td className="px-6 py-4 whitespace-nowrap">
         <div className="flex items-center">
-          <div className="w-10 h-10 bg-primary-100 rounded-full flex items-center justify-center">
-            <Users className="h-5 w-5 text-primary-600" />
+          <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
+            <Users className="h-5 w-5 text-blue-600" />
           </div>
           <div className="ml-4">
             <div className="text-sm font-medium text-gray-900">{user.username}</div>
@@ -105,43 +160,12 @@ const UserRow = ({ user, onUpdate }) => {
         </span>
       </td>
       <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-        <div className="relative">
-          <button
-            onClick={() => setIsMenuOpen(!isMenuOpen)}
-            className="text-gray-400 hover:text-gray-600 p-2 rounded-lg hover:bg-gray-100"
-          >
-            <MoreVertical className="h-4 w-4" />
-          </button>
-          
-          {isMenuOpen && (
-            <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-1 z-10">
-              <div className="px-3 py-2 border-b border-gray-200">
-                <p className="text-xs font-medium text-gray-500">Change Role</p>
-              </div>
-              {['user', 'owner', 'superAdmin'].map((role) => (
-                <button
-                  key={role}
-                  onClick={() => handleRoleChange(role)}
-                  disabled={user.role === role || updateRoleMutation.isLoading}
-                  className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  {role === 'superAdmin' ? 'Super Admin' : role.charAt(0).toUpperCase() + role.slice(1)}
-                  {user.role === role && ' (Current)'}
-                </button>
-              ))}
-              <div className="border-t border-gray-200 mt-1">
-                <button
-                  onClick={handleDelete}
-                  disabled={deleteUserMutation.isLoading}
-                  className="w-full text-left px-4 py-2 text-sm text-red-700 hover:bg-red-50 disabled:opacity-50"
-                >
-                  <Trash2 className="h-4 w-4 inline mr-2" />
-                  Delete User
-                </button>
-              </div>
-            </div>
-          )}
-        </div>
+        <button
+          onClick={() => onOpenModal(user)}
+          className="inline-flex items-center justify-center p-2 text-blue-600 hover:text-blue-700 bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors"
+        >
+          <MoreVertical className="h-5 w-5" />
+        </button>
       </td>
     </tr>
   )
@@ -151,11 +175,33 @@ const UserManagementPage = () => {
   const { user, isAuthenticated } = useAuth()
   const [searchTerm, setSearchTerm] = useState('')
   const [roleFilter, setRoleFilter] = useState('')
+  const [selectedUser, setSelectedUser] = useState(null)
+  const [isModalOpen, setIsModalOpen] = useState(false)
+  const queryClient = useQueryClient()
 
   // Check admin permissions
   if (!isAuthenticated || user?.role !== 'superAdmin') {
     return <Navigate to="/login" replace />
   }
+
+  // Mutations for user actions
+  const updateRoleMutation = useMutation({
+    mutationFn: ({ userId, role }) => adminService.updateUserRole(userId, role),
+    onSuccess: () => {
+      queryClient.invalidateQueries(['adminUsers'])
+      setIsModalOpen(false)
+      setSelectedUser(null)
+    }
+  })
+
+  const deleteUserMutation = useMutation({
+    mutationFn: (userId) => adminService.deleteUser(userId),
+    onSuccess: () => {
+      queryClient.invalidateQueries(['adminUsers'])
+      setIsModalOpen(false)
+      setSelectedUser(null)
+    }
+  })
 
   // Fetch users
   const { data: usersData, isLoading, error, refetch } = useQuery({
@@ -168,9 +214,46 @@ const UserManagementPage = () => {
   })
 
   const users = usersData?.users || []
+  
+  // Count total super admins
+  const totalSuperAdmins = users.filter(u => u.role === 'superAdmin').length
 
   const handleRefresh = () => {
     refetch()
+  }
+
+  const handleOpenModal = (userData) => {
+    setSelectedUser(userData)
+    setIsModalOpen(true)
+  }
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false)
+    setSelectedUser(null)
+  }
+
+  const handleRoleChange = (newRole) => {
+    if (!selectedUser) return
+    
+    // Prevent demoting the last superAdmin
+    if (selectedUser.role === 'superAdmin' && newRole !== 'superAdmin' && totalSuperAdmins <= 1) {
+      alert('Cannot demote the last super admin. At least one super admin must exist.')
+      return
+    }
+    
+    updateRoleMutation.mutate({ userId: selectedUser.id, role: newRole })
+  }
+
+  const handleDelete = () => {
+    if (!selectedUser) return
+    
+    // Prevent deleting the last superAdmin
+    if (selectedUser.role === 'superAdmin' && totalSuperAdmins <= 1) {
+      alert('Cannot delete the last super admin. At least one super admin must exist.')
+      return
+    }
+    
+    deleteUserMutation.mutate(selectedUser.id)
   }
 
   if (isLoading) {
@@ -178,7 +261,7 @@ const UserManagementPage = () => {
       <div className="min-h-screen bg-gray-50 py-8">
         <div className="container mx-auto px-4">
           <div className="flex items-center justify-center py-12">
-            <Loader2 className="h-8 w-8 animate-spin text-primary-600" />
+            <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
             <span className="ml-2 text-gray-600">Loading users...</span>
           </div>
         </div>
@@ -194,7 +277,7 @@ const UserManagementPage = () => {
             <AlertCircle className="h-12 w-12 text-red-600 mx-auto mb-4" />
             <h2 className="text-lg font-medium text-red-800 mb-2">Error Loading Users</h2>
             <p className="text-red-600">Failed to load user data. Please try again later.</p>
-            <button onClick={handleRefresh} className="mt-4 btn-primary">
+            <button onClick={handleRefresh} className="mt-4 bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg transition-colors duration-200">
               Try Again
             </button>
           </div>
@@ -225,7 +308,7 @@ const UserManagementPage = () => {
                   placeholder="Search users by name or email..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none"
+                  className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
                 />
               </div>
             </div>
@@ -236,7 +319,7 @@ const UserManagementPage = () => {
                 <select
                   value={roleFilter}
                   onChange={(e) => setRoleFilter(e.target.value)}
-                  className="border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none"
+                  className="border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
                 >
                   <option value="">All Roles</option>
                   <option value="user">Users</option>
@@ -247,7 +330,7 @@ const UserManagementPage = () => {
               
               <button
                 onClick={handleRefresh}
-                className="btn-primary"
+                className="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg transition-colors duration-200"
               >
                 Refresh
               </button>
@@ -265,7 +348,7 @@ const UserManagementPage = () => {
           
           {users.length > 0 ? (
             <div className="overflow-x-auto">
-              <table className="min-w-full divide-y divide-gray-200">
+              <table className="min-w-full divide-y divide-gray-200 relative">
                 <thead className="bg-gray-50">
                   <tr>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -290,7 +373,7 @@ const UserManagementPage = () => {
                     <UserRow 
                       key={userData.id} 
                       user={userData} 
-                      onUpdate={handleRefresh}
+                      onOpenModal={handleOpenModal}
                     />
                   ))}
                 </tbody>
@@ -310,6 +393,19 @@ const UserManagementPage = () => {
           )}
         </div>
       </div>
+
+      {/* Modal - Rendered outside table structure */}
+      {selectedUser && (
+        <UserActionModal
+          isOpen={isModalOpen}
+          onClose={handleCloseModal}
+          user={selectedUser}
+          onRoleChange={handleRoleChange}
+          onDelete={handleDelete}
+          isUpdating={updateRoleMutation.isLoading}
+          isDeleting={deleteUserMutation.isLoading}
+        />
+      )}
     </div>
   )
 }
