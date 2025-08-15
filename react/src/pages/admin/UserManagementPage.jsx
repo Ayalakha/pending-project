@@ -108,36 +108,7 @@ const UserActionModal = ({ isOpen, onClose, user, onRoleChange, onDelete, isUpda
   )
 }
 
-const UserRow = ({ user, onUpdate }) => {
-  const [isModalOpen, setIsModalOpen] = useState(false)
-  const queryClient = useQueryClient()
-
-  const updateRoleMutation = useMutation({
-    mutationFn: ({ userId, role }) => adminService.updateUserRole(userId, role),
-    onSuccess: () => {
-      queryClient.invalidateQueries(['adminUsers'])
-      onUpdate()
-      setIsModalOpen(false)
-    }
-  })
-
-  const deleteUserMutation = useMutation({
-    mutationFn: (userId) => adminService.deleteUser(userId),
-    onSuccess: () => {
-      queryClient.invalidateQueries(['adminUsers'])
-      onUpdate()
-      setIsModalOpen(false)
-    }
-  })
-
-  const handleRoleChange = (newRole) => {
-    updateRoleMutation.mutate({ userId: user.id, role: newRole })
-  }
-
-  const handleDelete = () => {
-    deleteUserMutation.mutate(user.id)
-  }
-
+const UserRow = ({ user, onOpenModal }) => {
   const getRoleBadge = (role) => {
     const badges = {
       superAdmin: { color: 'bg-red-100 text-red-800', icon: Crown, label: 'Super Admin' },
@@ -164,52 +135,39 @@ const UserRow = ({ user, onUpdate }) => {
   }
 
   return (
-    <>
-      <tr className="hover:bg-gray-50">
-        <td className="px-6 py-4 whitespace-nowrap">
-          <div className="flex items-center">
-            <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
-              <Users className="h-5 w-5 text-blue-600" />
-            </div>
-            <div className="ml-4">
-              <div className="text-sm font-medium text-gray-900">{user.username}</div>
-              <div className="text-sm text-gray-500">{user.email}</div>
-            </div>
+    <tr className="hover:bg-gray-50">
+      <td className="px-6 py-4 whitespace-nowrap">
+        <div className="flex items-center">
+          <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
+            <Users className="h-5 w-5 text-blue-600" />
           </div>
-        </td>
-        <td className="px-6 py-4 whitespace-nowrap">
-          {getRoleBadge(user.role)}
-        </td>
-        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-          {formatDate(user.created_at)}
-        </td>
-        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-            <Check className="w-3 h-3 mr-1" />
-            Active
-          </span>
-        </td>
-        <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-          <button
-            onClick={() => setIsModalOpen(true)}
-            className="inline-flex items-center justify-center p-2 text-blue-600 hover:text-blue-700 bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors"
-          >
-            <MoreVertical className="h-5 w-5" />
-          </button>
-        </td>
-      </tr>
-
-      {/* Modal */}
-      <UserActionModal
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        user={user}
-        onRoleChange={handleRoleChange}
-        onDelete={handleDelete}
-        isUpdating={updateRoleMutation.isLoading}
-        isDeleting={deleteUserMutation.isLoading}
-      />
-    </>
+          <div className="ml-4">
+            <div className="text-sm font-medium text-gray-900">{user.username}</div>
+            <div className="text-sm text-gray-500">{user.email}</div>
+          </div>
+        </div>
+      </td>
+      <td className="px-6 py-4 whitespace-nowrap">
+        {getRoleBadge(user.role)}
+      </td>
+      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+        {formatDate(user.created_at)}
+      </td>
+      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+          <Check className="w-3 h-3 mr-1" />
+          Active
+        </span>
+      </td>
+      <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+        <button
+          onClick={() => onOpenModal(user)}
+          className="inline-flex items-center justify-center p-2 text-blue-600 hover:text-blue-700 bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors"
+        >
+          <MoreVertical className="h-5 w-5" />
+        </button>
+      </td>
+    </tr>
   )
 }
 
@@ -217,11 +175,33 @@ const UserManagementPage = () => {
   const { user, isAuthenticated } = useAuth()
   const [searchTerm, setSearchTerm] = useState('')
   const [roleFilter, setRoleFilter] = useState('')
+  const [selectedUser, setSelectedUser] = useState(null)
+  const [isModalOpen, setIsModalOpen] = useState(false)
+  const queryClient = useQueryClient()
 
   // Check admin permissions
   if (!isAuthenticated || user?.role !== 'superAdmin') {
     return <Navigate to="/login" replace />
   }
+
+  // Mutations for user actions
+  const updateRoleMutation = useMutation({
+    mutationFn: ({ userId, role }) => adminService.updateUserRole(userId, role),
+    onSuccess: () => {
+      queryClient.invalidateQueries(['adminUsers'])
+      setIsModalOpen(false)
+      setSelectedUser(null)
+    }
+  })
+
+  const deleteUserMutation = useMutation({
+    mutationFn: (userId) => adminService.deleteUser(userId),
+    onSuccess: () => {
+      queryClient.invalidateQueries(['adminUsers'])
+      setIsModalOpen(false)
+      setSelectedUser(null)
+    }
+  })
 
   // Fetch users
   const { data: usersData, isLoading, error, refetch } = useQuery({
@@ -234,9 +214,46 @@ const UserManagementPage = () => {
   })
 
   const users = usersData?.users || []
+  
+  // Count total super admins
+  const totalSuperAdmins = users.filter(u => u.role === 'superAdmin').length
 
   const handleRefresh = () => {
     refetch()
+  }
+
+  const handleOpenModal = (userData) => {
+    setSelectedUser(userData)
+    setIsModalOpen(true)
+  }
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false)
+    setSelectedUser(null)
+  }
+
+  const handleRoleChange = (newRole) => {
+    if (!selectedUser) return
+    
+    // Prevent demoting the last superAdmin
+    if (selectedUser.role === 'superAdmin' && newRole !== 'superAdmin' && totalSuperAdmins <= 1) {
+      alert('Cannot demote the last super admin. At least one super admin must exist.')
+      return
+    }
+    
+    updateRoleMutation.mutate({ userId: selectedUser.id, role: newRole })
+  }
+
+  const handleDelete = () => {
+    if (!selectedUser) return
+    
+    // Prevent deleting the last superAdmin
+    if (selectedUser.role === 'superAdmin' && totalSuperAdmins <= 1) {
+      alert('Cannot delete the last super admin. At least one super admin must exist.')
+      return
+    }
+    
+    deleteUserMutation.mutate(selectedUser.id)
   }
 
   if (isLoading) {
@@ -356,7 +373,7 @@ const UserManagementPage = () => {
                     <UserRow 
                       key={userData.id} 
                       user={userData} 
-                      onUpdate={handleRefresh}
+                      onOpenModal={handleOpenModal}
                     />
                   ))}
                 </tbody>
@@ -376,6 +393,19 @@ const UserManagementPage = () => {
           )}
         </div>
       </div>
+
+      {/* Modal - Rendered outside table structure */}
+      {selectedUser && (
+        <UserActionModal
+          isOpen={isModalOpen}
+          onClose={handleCloseModal}
+          user={selectedUser}
+          onRoleChange={handleRoleChange}
+          onDelete={handleDelete}
+          isUpdating={updateRoleMutation.isLoading}
+          isDeleting={deleteUserMutation.isLoading}
+        />
+      )}
     </div>
   )
 }
