@@ -13,7 +13,9 @@ class CompanyController extends Controller
      */
     public function index(Request $request)
     {
-        $query = Company::with('owner', 'servicesOrProducts')
+        $query = Company::with(['owner', 'servicesOrProducts', 'approvedReviews'])
+            ->withCount('approvedReviews as total_reviews')
+            ->withAvg('approvedReviews as average_rating', 'rating')
             ->orderBy('created_at', 'desc');
 
         // Add search functionality
@@ -83,7 +85,9 @@ class CompanyController extends Controller
      */
     public function show(Company $company)
     {
-        $company->load('owner', 'servicesOrProducts');
+        $company->load(['owner', 'servicesOrProducts', 'approvedReviews']);
+        $company->loadCount('approvedReviews as total_reviews');
+        $company->loadAvg('approvedReviews as average_rating', 'rating');
 
         return response()->json([
             'status' => 'success',

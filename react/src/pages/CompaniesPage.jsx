@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
 import { companyService } from '../services/companyService'
+import StarRating from '../components/reviews/StarRating'
 import { Building2, MapPin, Phone, Globe, Users, Loader2, Search, X, ArrowRight, Star, Filter } from 'lucide-react'
 import { Link, useSearchParams } from 'react-router-dom'
 import { useState, useEffect } from 'react'
@@ -29,10 +30,15 @@ const CompanyCard = ({ company }) => {
             <h3 className="text-2xl font-bold text-gray-900 group-hover:text-blue-600 transition-colors duration-300">
               {company.name}
             </h3>
-            <div className="flex items-center space-x-1">
-              {Array.from({ length: 5 }, (_, i) => (
-                <Star key={i} className="w-4 h-4 text-yellow-400 fill-current" />
-              ))}
+            <div className="flex items-center space-x-2">
+              <StarRating 
+                rating={Math.round(company.average_rating || 0)} 
+                readOnly 
+                size="w-4 h-4" 
+              />
+              <span className="text-sm text-gray-500">
+                ({company.total_reviews || 0})
+              </span>
             </div>
           </div>
           

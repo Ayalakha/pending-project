@@ -4,6 +4,7 @@ use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\BlogController;
 use App\Http\Controllers\CommentController;
 use App\Http\Controllers\CompanyController;
+use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\ServiceOrProductController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -26,6 +27,9 @@ Route::get('/blogs', [BlogController::class, 'index']);
 Route::get('/blogs/{blog}', [BlogController::class, 'show']);
 Route::get('/blogs/{blog}/comments', [CommentController::class, 'index']);
 
+// Public review routes (view reviews)
+Route::get('/companies/{company}/reviews', [ReviewController::class, 'index']);
+
 // Protected routes
 Route::middleware('auth:sanctum')->group(function () {
     // Auth routes
@@ -37,6 +41,13 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/blogs/{blog}/comments', [CommentController::class, 'store']);
     Route::put('/comments/{comment}', [CommentController::class, 'update']);
     Route::delete('/comments/{comment}', [CommentController::class, 'destroy']);
+    
+    // Reviews - any authenticated user can review companies
+    Route::post('/companies/{company}/reviews', [ReviewController::class, 'store']);
+    Route::get('/companies/{company}/user-review', [ReviewController::class, 'getUserReview']);
+    Route::put('/reviews/{review}', [ReviewController::class, 'update']);
+    Route::delete('/reviews/{review}', [ReviewController::class, 'destroy']);
+    Route::post('/reviews/{review}/helpful', [ReviewController::class, 'toggleHelpful']);
     
     // Owner routes (company owners)
     Route::middleware('role:owner,superAdmin')->group(function () {

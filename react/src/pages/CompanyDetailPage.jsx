@@ -1,6 +1,7 @@
 import { useQuery } from '@tanstack/react-query'
 import { useParams, Link } from 'react-router-dom'
 import { companyService } from '../services/companyService'
+import ReviewList from '../components/reviews/ReviewList'
 import { 
   Building2, 
   MapPin, 
@@ -13,7 +14,8 @@ import {
   Loader2,
   ExternalLink,
   Tag,
-  Users
+  Users,
+  Star
 } from 'lucide-react'
 
 const ServiceCard = ({ service }) => {
@@ -221,6 +223,15 @@ const CompanyDetailPage = () => {
               ))}
             </div>
           )}
+        </div>
+
+        {/* Reviews Section */}
+        <div>
+          <h2 className="text-2xl font-bold text-gray-900 mb-6 flex items-center">
+            <Star className="h-6 w-6 mr-2 text-primary-600" />
+            Reviews & Ratings
+          </h2>
+          <ReviewList companyId={company.id} />
         </div>
 
         {/* Contact Section */}
