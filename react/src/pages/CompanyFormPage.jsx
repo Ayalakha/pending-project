@@ -3,10 +3,10 @@ import { useNavigate, useParams, Navigate } from 'react-router-dom'
 import { useMutation, useQuery } from '@tanstack/react-query'
 import { companyService } from '../services/companyService'
 import { useAuth } from '../contexts/AuthContext'
-import { 
-  Building2, 
-  Loader2, 
-  ArrowLeft, 
+import {
+  Building2,
+  Loader2,
+  ArrowLeft,
   AlertCircle,
   Save,
   X
@@ -76,7 +76,7 @@ const CompanyFormPage = () => {
   // Create/Update mutation
   const mutation = useMutation({
     mutationFn: (data) => {
-      return isEditing 
+      return isEditing
         ? companyService.updateCompany(id, data)
         : companyService.createCompany(data)
     },
@@ -99,7 +99,7 @@ const CompanyFormPage = () => {
       ...prev,
       [name]: value
     }))
-    
+
     // Clear error when user starts typing
     if (errors[name]) {
       setErrors(prev => ({
@@ -111,15 +111,15 @@ const CompanyFormPage = () => {
 
   const validateForm = () => {
     const newErrors = {}
-    
+
     if (!formData.name.trim()) {
       newErrors.name = 'Company name is required'
     }
-    
+
     if (formData.website && !isValidUrl(formData.website)) {
       newErrors.website = 'Please enter a valid website URL'
     }
-    
+
     setErrors(newErrors)
     return Object.keys(newErrors).length === 0
   }
@@ -135,7 +135,7 @@ const CompanyFormPage = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault()
-    
+
     if (validateForm()) {
       // Clean up data before sending
       const cleanData = Object.fromEntries(
@@ -165,12 +165,13 @@ const CompanyFormPage = () => {
         <div className="mb-8">
           <button
             onClick={() => navigate('/my-companies')}
-            className="flex items-center text-gray-600 hover:text-gray-900 mb-4 transition-colors"
+            className="flex items-center bg-white text-gray-600 hover:text-gray-900 mb-4 transition-colors focus:outline-none border-none"
           >
-            <ArrowLeft className="h-4 w-4 mr-2" />
+
+            <ArrowLeft className="h-4 w-4 mr-2 b" />
             Back to My Companies
           </button>
-          
+
           <div className="flex items-center space-x-3">
             <div className="w-12 h-12 bg-primary-100 rounded-lg flex items-center justify-center">
               <Building2 className="h-6 w-6 text-primary-600" />
@@ -200,9 +201,8 @@ const CompanyFormPage = () => {
                 name="name"
                 value={formData.name}
                 onChange={handleChange}
-                className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none transition-colors ${
-                  errors.name ? 'border-red-300' : 'border-gray-300'
-                }`}
+                className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none transition-colors ${errors.name ? 'border-red-300' : 'border-gray-300'
+                  }`}
                 placeholder="Enter your company name"
                 required
               />
@@ -254,9 +254,8 @@ const CompanyFormPage = () => {
                 name="website"
                 value={formData.website}
                 onChange={handleChange}
-                className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none transition-colors ${
-                  errors.website ? 'border-red-300' : 'border-gray-300'
-                }`}
+                className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none transition-colors ${errors.website ? 'border-red-300' : 'border-gray-300'
+                  }`}
                 placeholder="https://yourcompany.com"
               />
               {errors.website && (
@@ -339,7 +338,7 @@ const CompanyFormPage = () => {
               <button
                 type="button"
                 onClick={() => navigate('/my-companies')}
-                className="px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors flex items-center"
+                className="px-5 py-2.5 flex items-center  text-gray-600 bg-gray-50 hover:bg-red-50 hover:text-red-600 transition-colors duration-200 focus:outline-none font-medium shadow-sm  outline-none border-none"
               >
                 <X className="h-4 w-4 mr-2" />
                 Cancel
@@ -361,6 +360,9 @@ const CompanyFormPage = () => {
                   </>
                 )}
               </button>
+
+
+
             </div>
           </form>
         </div>

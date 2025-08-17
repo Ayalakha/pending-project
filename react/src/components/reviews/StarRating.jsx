@@ -4,7 +4,7 @@ const StarRating = ({ rating, onRatingChange, readOnly = false, size = 'w-5 h-5'
   const stars = [1, 2, 3, 4, 5]
 
   return (
-    <div className="flex items-center space-x-1">
+    <div className="flex items-center space-x-1 bg">
       {stars.map((star) => (
         <Star
           key={star}
