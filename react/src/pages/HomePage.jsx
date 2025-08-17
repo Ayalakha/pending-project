@@ -384,11 +384,11 @@ const HomePage = () => {
             </Link>
             <Link
               to="/register"
-             className="bg-white/10 text-white hover:bg-white/20 px-8 py-4 rounded-xl font-semibold text-lg transition-colors duration-300 flex items-center space-x-2"
+             className=" text-white px-8 py-4 rounded-xl font-semibold transition-colors duration-300 flex items-center space-x-2"
 >
 
               <Building2 className="w-5 h-5" />
-              <span>List Your Business</span>
+              <span>List Your Businessss</span>
             </Link>
           </div>
 

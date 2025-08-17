@@ -1,9 +1,9 @@
 import { useAuth } from '../../contexts/AuthContext'
 import { useQuery } from '@tanstack/react-query'
 import { companyService } from '../../services/companyService'
-import { 
-  Building2, 
-  Users, 
+import {
+  Building2,
+  Users,
   TrendingUp,
   Plus,
   Settings,
@@ -61,8 +61,8 @@ const OwnerDashboard = () => {
               </p>
             </div>
           </div>
-          <Link 
-            to="/companies/new" 
+          <Link
+            to="/companies/new"
             className="btn-primary flex items-center"
           >
             <Plus className="h-4 w-4 mr-2" />
@@ -132,15 +132,18 @@ const OwnerDashboard = () => {
               View All →
             </Link>
           </div>
-          
+
           {ownerStats.companies === 0 ? (
             <div className="text-center py-8">
               <Building2 className="h-12 w-12 text-gray-400 mx-auto mb-4" />
               <p className="text-gray-500 mb-4">No businesses listed yet</p>
-              <Link to="/companies/new" className="btn-primary">
-                <Plus className="h-4 w-4 mr-2" />
+              <Link
+                to="/companies/new"
+                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+              >
                 Create Your First Business
               </Link>
+
             </div>
           ) : (
             <div className="space-y-4">
@@ -154,8 +157,8 @@ const OwnerDashboard = () => {
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
           <h2 className="text-lg font-semibold text-gray-900 mb-4">Quick Actions</h2>
           <div className="space-y-3">
-            <Link 
-              to="/companies/new" 
+            <Link
+              to="/companies/new"
               className="block p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
             >
               <div className="flex items-center">
@@ -167,8 +170,8 @@ const OwnerDashboard = () => {
               </div>
             </Link>
 
-            <Link 
-              to="/my-companies" 
+            <Link
+              to="/my-companies"
               className="block p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
             >
               <div className="flex items-center">
@@ -180,18 +183,21 @@ const OwnerDashboard = () => {
               </div>
             </Link>
 
-            <div className="block p-4 border border-gray-200 rounded-lg bg-gray-50 transition-colors">
+            <Link
+              to="/owner/analytics"
+              className="block p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
+            >
               <div className="flex items-center">
-                <BarChart3 className="h-5 w-5 text-gray-400 mr-3" />
+                <BarChart3 className="h-5 w-5 text-gray-600 mr-3" />
                 <div>
-                  <p className="font-medium text-gray-600">View Analytics</p>
-                  <p className="text-sm text-gray-500">Coming Soon</p>
+                  <p className="font-medium text-gray-900">View Analytics</p>
+                  <p className="text-sm text-gray-600">Track your business performance</p>
                 </div>
               </div>
-            </div>
+            </Link>
 
-            <Link 
-              to="/profile" 
+            <Link
+              to="/profile"
               className="block p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
             >
               <div className="flex items-center">
