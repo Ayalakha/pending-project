@@ -1,11 +1,14 @@
 import { useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import { useAuth } from '../../contexts/AuthContext'
 import { Mail, Lock, Eye, EyeOff, Loader2, Building2, User, Users, ArrowRight, Shield, CheckCircle } from 'lucide-react'
 
 const RegisterPage = () => {
   const navigate = useNavigate()
+  const [searchParams] = useSearchParams()
   const { register } = useAuth()
+
+  const redirectPath = searchParams.get('redirect') || '/'
 
   const [formData, setFormData] = useState({
     username: '',
@@ -96,9 +99,9 @@ const RegisterPage = () => {
       console.log('Registration result:', result)
       
       if (result.success) {
-        console.log('Registration successful, redirecting...')
-        // Redirect to home page after successful registration
-        navigate('/', { replace: true })
+        console.log('Registration successful, redirecting to:', redirectPath)
+        // Redirect to the intended path or home page after successful registration
+        navigate(redirectPath, { replace: true })
       } else {
         console.log('Registration failed:', result.error)
         // Handle API validation errors
@@ -359,7 +362,7 @@ const RegisterPage = () => {
           <p className="text-gray-600">
             Already have an account?{' '}
             <Link 
-              to="/login" 
+              to={`/login${redirectPath !== '/' ? `?redirect=${encodeURIComponent(redirectPath)}` : ''}`}
               className="text-blue-600 hover:text-blue-700 font-semibold transition-colors duration-200"
             >
               Sign in here

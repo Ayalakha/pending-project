@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { useNavigate, useParams, Navigate } from 'react-router-dom'
+import { useNavigate, useParams, Navigate, useLocation } from 'react-router-dom'
 import { useMutation, useQuery } from '@tanstack/react-query'
 import { companyService } from '../services/companyService'
 import { useAuth } from '../contexts/AuthContext'
@@ -15,12 +15,13 @@ import {
 const CompanyFormPage = () => {
   const navigate = useNavigate()
   const { id } = useParams()
+  const location = useLocation()
   const isEditing = Boolean(id)
   const { user, isAuthenticated } = useAuth()
 
   // Redirect if not authenticated or not an owner
   if (!isAuthenticated) {
-    return <Navigate to="/login" replace />
+    return <Navigate to="/login" state={{ from: location }} replace />
   }
 
   if (user?.role !== 'owner' && user?.role !== 'superAdmin') {

@@ -49,7 +49,7 @@ const UserActionModal = ({ isOpen, onClose, user, onRoleChange, onDelete, isUpda
             <h3 className="text-lg font-semibold text-gray-900">User Actions</h3>
             <button
               onClick={onClose}
-              className="text-gray-400 hover:text-gray-600 p-1 rounded-lg hover:bg-gray-100 transition-colors"
+              className="text-gray-400 hover:text-gray-600 p-1 rounded-lg bg-white hover:bg-gray-100 transition-colors"
             >
               <X className="h-5 w-5" />
             </button>

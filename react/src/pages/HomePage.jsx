@@ -1,9 +1,11 @@
 import { Search, Building2, Users, TrendingUp, ArrowRight, Shield, Star, CheckCircle, Globe, Target, Award, Briefcase, Coffee, HeartHandshake, Clock, MapPin, Zap, Users2, Trophy } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { useState } from 'react'
+import { useAuth } from '../contexts/AuthContext'
 
 const HomePage = () => {
   const [searchQuery, setSearchQuery] = useState('')
+  const { user, isAuthenticated } = useAuth()
 
   const stats = [
     {
@@ -383,12 +385,11 @@ const HomePage = () => {
               <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform duration-300" />
             </Link>
             <Link
-              to="/register"
-             className=" text-white px-8 py-4 rounded-xl font-semibold transition-colors duration-300 flex items-center space-x-2"
->
-
+              to={isAuthenticated ? "/companies/new" : "/register?redirect=/companies/new"}
+              className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white px-8 py-4 rounded-xl font-semibold transition-all duration-300 hover:scale-105 flex items-center space-x-2"
+            >
               <Building2 className="w-5 h-5" />
-              <span>List Your Businessss</span>
+              <span>{isAuthenticated ? "Add Your Company" : "List Your Business"}</span>
             </Link>
           </div>
 

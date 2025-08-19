@@ -1,11 +1,12 @@
 import { useState } from 'react'
-import { Link, useNavigate, useLocation } from 'react-router-dom'
+import { Link, useNavigate, useLocation, useSearchParams } from 'react-router-dom'
 import { useAuth } from '../../contexts/AuthContext'
 import { Mail, Lock, Eye, EyeOff, Loader2, Building2, ArrowRight, Shield } from 'lucide-react'
 
 const LoginPage = () => {
   const navigate = useNavigate()
   const location = useLocation()
+  const [searchParams] = useSearchParams()
   const { login } = useAuth()
 
   const [formData, setFormData] = useState({
@@ -16,8 +17,10 @@ const LoginPage = () => {
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState('')
 
-  // Get the redirect path from location state or default to home
-  const from = location.state?.from?.pathname || '/'
+  // Get the redirect path from URL params, location state, or default to home
+  const redirectFromParams = searchParams.get('redirect')
+  const redirectFromState = location.state?.from?.pathname
+  const from = redirectFromParams || redirectFromState || '/'
 
   const handleChange = (e) => {
     const { name, value } = e.target
@@ -186,7 +189,7 @@ const LoginPage = () => {
           <p className="text-gray-600">
             Don't have an account?{' '}
             <Link 
-              to="/register" 
+              to={`/register${from !== '/' ? `?redirect=${encodeURIComponent(from)}` : ''}`}
               className="text-blue-600 hover:text-blue-700 font-semibold transition-colors duration-200"
             >
               Sign up now
