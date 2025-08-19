@@ -18,19 +18,35 @@ export const AuthProvider = ({ children }) => {
 
   // Initialize auth state on mount
   useEffect(() => {
-    const initializeAuth = () => {
+    const initializeAuth = async () => {
       try {
+        // First check if we have token and user in localStorage
         const currentUser = authService.getCurrentUser()
-        const isAuth = authService.isAuthenticated()
+        const token = authService.getToken()
         
-        if (currentUser && isAuth) {
-          setUser(currentUser)
-          setIsAuthenticated(true)
+        if (currentUser && token) {
+          // Validate token with server
+          const validation = await authService.validateToken()
+          
+          if (validation.valid) {
+            setUser(validation.user)
+            setIsAuthenticated(true)
+          } else {
+            // Token is invalid, clear auth state
+            setUser(null)
+            setIsAuthenticated(false)
+          }
+        } else {
+          // No auth data found
+          setUser(null)
+          setIsAuthenticated(false)
         }
       } catch (error) {
         console.error('Auth initialization error:', error)
         // Clear invalid auth data
         authService.logout()
+        setUser(null)
+        setIsAuthenticated(false)
       } finally {
         setIsLoading(false)
       }

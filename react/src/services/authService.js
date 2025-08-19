@@ -77,6 +77,24 @@ export const authService = {
     return !!(token && user)
   },
 
+  // Validate token with server
+  validateToken: async () => {
+    try {
+      const response = await api.get('/auth/me')
+      if (response.data.status === 'success') {
+        // Update user data in case it changed
+        localStorage.setItem('user', JSON.stringify(response.data.user))
+        return { valid: true, user: response.data.user }
+      }
+    } catch (error) {
+      // Token is invalid
+      localStorage.removeItem('auth_token')
+      localStorage.removeItem('user')
+      return { valid: false }
+    }
+    return { valid: false }
+  },
+
   // Get user profile
   getProfile: async () => {
     const response = await api.get('/auth/profile')

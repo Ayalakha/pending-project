@@ -106,8 +106,10 @@ class ReviewController extends Controller
      */
     public function destroy(Review $review): JsonResponse
     {
+        $user = Auth::user();
+        
         // Check if user owns this review or is admin
-        if ($review->user_id !== Auth::id() && !Auth::user()->isSuperAdmin()) {
+        if ($review->user_id !== $user->id && $user->role !== 'superAdmin') {
             return response()->json([
                 'success' => false,
                 'message' => 'Unauthorized'

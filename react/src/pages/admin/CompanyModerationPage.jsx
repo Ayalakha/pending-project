@@ -133,7 +133,7 @@ const CompanyCard = ({ company, onUpdate }) => {
         <div className="flex items-center justify-between pt-4 border-t border-gray-200">
           <button
             onClick={() => setShowDetails(!showDetails)}
-            className="inline-flex items-center text-gray-600 hover:text-gray-800 text-sm"
+            className="inline-flex items-center text-black-600 bg-white hover:text-gray-800 text-sm"
           >
             <Eye className="h-4 w-4 mr-1" />
             {showDetails ? 'Hide Details' : 'View Details'}

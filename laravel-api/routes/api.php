@@ -213,7 +213,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
         $search = $request->get('search');
         $status = $request->get('status');
         
-        $query = \App\Models\Company::with('user');
+        $query = \App\Models\Company::with('owner'); // Changed from 'user' to 'owner'
         
         if ($search) {
             $query->where('name', 'like', "%{$search}%");

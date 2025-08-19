@@ -19,6 +19,7 @@ class Company extends Model
         'rc',
         'legal_form',
         'owner_id',
+        'status',
     ];
 
     // Relationships
