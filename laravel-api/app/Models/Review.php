@@ -15,7 +15,11 @@ class Review extends Model
         'comment',
         'is_verified',
         'is_approved',
-        'helpful_votes'
+        'helpful_votes',
+        'status',
+        'moderation_notes',
+        'moderated_by',
+        'moderated_at',
     ];
 
     protected $casts = [
@@ -34,6 +38,11 @@ class Review extends Model
     public function company(): BelongsTo
     {
         return $this->belongsTo(Company::class);
+    }
+
+    public function moderatedBy(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'moderated_by');
     }
 
     // Scopes

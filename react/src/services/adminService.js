@@ -78,5 +78,37 @@ export const adminService = {
   getActivityLogs: async (params = {}) => {
     const response = await api.get('/admin/activity-logs', { params })
     return response.data
+  },
+
+  // Content Moderation
+  getContentForModeration: async (token, filters = {}) => {
+    const response = await api.get('/admin/content', { 
+      params: filters,
+      headers: { Authorization: `Bearer ${token}` }
+    })
+    return response.data
+  },
+
+  getContentStats: async (token) => {
+    const response = await api.get('/admin/content/stats', {
+      headers: { Authorization: `Bearer ${token}` }
+    })
+    return response.data
+  },
+
+  moderateContent: async (token, data) => {
+    const response = await api.post('/admin/content/moderate', data, {
+      headers: { Authorization: `Bearer ${token}` }
+    })
+    return response.data
+  },
+
+  getContentDetails: async (token, type, id) => {
+    const response = await api.get(`/admin/content/${type}/${id}`, {
+      headers: { Authorization: `Bearer ${token}` }
+    })
+    return response.data
   }
 }
+
+export { adminService as AdminService }

@@ -16,6 +16,7 @@ class CommentController extends Controller
     {
         $comments = $blog->comments()
             ->with('user:id,username')
+            ->where('status', 'approved')
             ->orderBy('created_at', 'desc')
             ->get();
 

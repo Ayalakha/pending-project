@@ -17,6 +17,7 @@ import LoginPage from './pages/auth/LoginPage'
 import RegisterPage from './pages/auth/RegisterPage'
 import UserManagementPage from './pages/admin/UserManagementPage'
 import CompanyModerationPage from './pages/admin/CompanyModerationPage'
+import ContentModerationPage from './components/admin/ContentModerationPage'
 import AnalyticsDashboard from './pages/admin/AnalyticsDashboard'
 import OwnerAnalytics from './pages/owner/OwnerAnalytics'
 
@@ -67,6 +68,7 @@ const AppContent = () => {
             <Route path="/profile" element={<ProfilePage />} />
             <Route path="/admin/users" element={<UserManagementPage />} />
             <Route path="/admin/companies" element={<CompanyModerationPage />} />
+            <Route path="/admin/content-moderation" element={<ContentModerationPage />} />
             <Route path="/admin/analytics" element={<AnalyticsDashboard />} />
             <Route path="/owner/analytics" element={<OwnerAnalytics />} />
             <Route path="/login" element={<LoginPage />} />

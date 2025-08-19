@@ -14,6 +14,10 @@ class Blog extends Model
         'content',
         'image',
         'user_id',
+        'status',
+        'moderation_notes',
+        'moderated_by',
+        'moderated_at',
     ];
 
     // Relationships
@@ -25,6 +29,11 @@ class Blog extends Model
     public function comments()
     {
         return $this->hasMany(Comment::class);
+    }
+
+    public function moderatedBy()
+    {
+        return $this->belongsTo(User::class, 'moderated_by');
     }
 
     // Helper methods

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Blog;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Auth;
 
 class BlogController extends Controller
 {
@@ -14,6 +15,7 @@ class BlogController extends Controller
     public function index()
     {
         $blogs = Blog::with(['author:id,username'])
+            ->where('status', 'approved')
             ->orderBy('created_at', 'desc')
             ->get();
 
@@ -70,6 +72,14 @@ class BlogController extends Controller
      */
     public function show(Blog $blog)
     {
+        // Only show approved blogs to non-admin users
+        if ($blog->status !== 'approved' && (!Auth::check() || Auth::user()->role !== 'superAdmin')) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Blog not found'
+            ], 404);
+        }
+
         $blog->load('author:id,username');
 
         return response()->json([

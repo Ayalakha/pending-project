@@ -17,9 +17,15 @@ import {
   AlertCircle,
   CheckCircle,
   XCircle,
-  Eye
+  Eye,
+  TrendingUp,
+  Users,
+  Store
 } from 'lucide-react'
 import { Navigate } from 'react-router-dom'
+import { Card, CardContent } from '../../components/ui/card'
+import { Button } from '../../components/ui/button'
+import { Badge } from '../../components/ui/badge'
 
 const CompanyCard = ({ company, onUpdate }) => {
   const [showDetails, setShowDetails] = useState(false)
@@ -55,20 +61,17 @@ const CompanyCard = ({ company, onUpdate }) => {
   }
 
   const getStatusBadge = (status) => {
-    const badges = {
-      pending: { color: 'bg-yellow-100 text-yellow-800', icon: Clock, label: 'Pending Review' },
-      approved: { color: 'bg-green-100 text-green-800', icon: CheckCircle, label: 'Approved' },
-      rejected: { color: 'bg-red-100 text-red-800', icon: XCircle, label: 'Rejected' }
+    const variants = {
+      pending: 'warning',
+      approved: 'success', 
+      rejected: 'destructive'
     }
-    const badge = badges[status] || badges.pending
-    const IconComponent = badge.icon
-    
-    return (
-      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${badge.color}`}>
-        <IconComponent className="w-3 h-3 mr-1" />
-        {badge.label}
-      </span>
-    )
+    const labels = {
+      pending: 'Pending Review',
+      approved: 'Approved',
+      rejected: 'Rejected'
+    }
+    return <Badge variant={variants[status] || 'default'}>{labels[status] || status}</Badge>
   }
 
   const formatDate = (dateString) => {
@@ -82,130 +85,144 @@ const CompanyCard = ({ company, onUpdate }) => {
   }
 
   return (
-    <div className="bg-white rounded-lg border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
-      <div className="p-6">
+    <Card className="hover:shadow-lg transition-all duration-200 border-0 shadow-md">
+      <CardContent className="p-6">
         {/* Header */}
         <div className="flex items-start justify-between mb-4">
           <div className="flex-1">
-            <div className="flex items-center mb-2">
-              <Building2 className="h-5 w-5 text-gray-400 mr-2" />
-              <h3 className="text-lg font-semibold text-gray-900">{company.name}</h3>
-            </div>
-            <p className="text-gray-600 text-sm line-clamp-2 mb-3">{company.description}</p>
-            <div className="flex items-center text-sm text-gray-500 space-x-4">
-              <div className="flex items-center">
-                <User className="h-4 w-4 mr-1" />
-                {company.user?.username || 'Unknown User'}
+            <div className="flex items-center gap-3 mb-2">
+              <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center shadow-sm">
+                <Building2 className="h-5 w-5 text-white" />
               </div>
-              <div className="flex items-center">
-                <Calendar className="h-4 w-4 mr-1" />
-                {formatDate(company.created_at)}
+              <div>
+                <h3 className="text-xl font-bold text-gray-900">{company.name}</h3>
+                {getStatusBadge(company.status)}
+              </div>
+            </div>
+            <p className="text-gray-600 line-clamp-2 mb-4">{company.description}</p>
+            <div className="grid grid-cols-2 gap-4 text-sm">
+              <div className="flex items-center text-gray-600">
+                <User className="h-4 w-4 mr-2 text-gray-400" />
+                <span>{company.user?.username || 'Unknown User'}</span>
+              </div>
+              <div className="flex items-center text-gray-600">
+                <Calendar className="h-4 w-4 mr-2 text-gray-400" />
+                <span>{formatDate(company.created_at)}</span>
               </div>
               {company.location && (
-                <div className="flex items-center">
-                  <MapPin className="h-4 w-4 mr-1" />
-                  {company.location}
+                <div className="flex items-center text-gray-600 col-span-2">
+                  <MapPin className="h-4 w-4 mr-2 text-gray-400" />
+                  <span>{company.location}</span>
                 </div>
               )}
             </div>
-          </div>
-          <div className="ml-4">
-            {getStatusBadge(company.status || 'pending')}
           </div>
         </div>
 
         {/* Website Link */}
         {company.website && (
-          <div className="mb-4">
+          <div className="mb-6">
             <a
               href={company.website}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center text-primary-600 hover:text-primary-700 text-sm"
+              className="inline-flex items-center text-blue-600 hover:text-blue-700 font-medium transition-colors"
             >
-              <ExternalLink className="h-4 w-4 mr-1" />
+              <ExternalLink className="h-4 w-4 mr-2" />
               Visit Website
             </a>
           </div>
         )}
 
         {/* Actions */}
-        <div className="flex items-center justify-between pt-4 border-t border-gray-200">
-          <button
+        <div className="flex items-center justify-between pt-6 border-t border-gray-100">
+          <Button
+            variant="outline"
+            size="sm"
             onClick={() => setShowDetails(!showDetails)}
-            className="inline-flex items-center text-black-600 bg-white hover:text-gray-800 text-sm"
+            className="text-gray-600 hover:text-gray-900"
           >
-            <Eye className="h-4 w-4 mr-1" />
+            <Eye className="h-4 w-4 mr-2" />
             {showDetails ? 'Hide Details' : 'View Details'}
-          </button>
+          </Button>
 
           {(company.status === 'pending' || !company.status) && (
-            <div className="flex items-center space-x-2">
-              <button
+            <div className="flex items-center gap-3">
+              <Button
+                variant="destructive"
+                size="sm"
                 onClick={handleReject}
                 disabled={rejectMutation.isLoading}
-                className="inline-flex items-center px-3 py-1.5 border border-red-300 text-red-700 bg-red-50 hover:bg-red-100 rounded-md text-sm font-medium disabled:opacity-50"
+                className="shadow-sm"
               >
                 {rejectMutation.isLoading ? (
-                  <Loader2 className="h-4 w-4 animate-spin mr-1" />
+                  <Loader2 className="h-4 w-4 animate-spin mr-2" />
                 ) : (
-                  <X className="h-4 w-4 mr-1" />
+                  <X className="h-4 w-4 mr-2" />
                 )}
                 Reject
-              </button>
-              <button
+              </Button>
+              <Button
+                size="sm"
                 onClick={handleApprove}
                 disabled={approveMutation.isLoading}
-                className="inline-flex items-center px-3 py-1.5 border border-green-300 text-green-700 bg-green-50 hover:bg-green-100 rounded-md text-sm font-medium disabled:opacity-50"
+                className="bg-green-600 hover:bg-green-700 shadow-sm"
               >
                 {approveMutation.isLoading ? (
-                  <Loader2 className="h-4 w-4 animate-spin mr-1" />
+                  <Loader2 className="h-4 w-4 animate-spin mr-2" />
                 ) : (
-                  <Check className="h-4 w-4 mr-1" />
+                  <Check className="h-4 w-4 mr-2" />
                 )}
                 Approve
-              </button>
+              </Button>
             </div>
           )}
         </div>
 
         {/* Expanded Details */}
         {showDetails && (
-          <div className="mt-4 pt-4 border-t border-gray-100 space-y-3">
-            <div>
-              <h4 className="text-sm font-medium text-gray-900 mb-1">Full Description</h4>
-              <p className="text-sm text-gray-600">{company.description}</p>
-            </div>
-            
-            {company.industry && (
-              <div>
-                <h4 className="text-sm font-medium text-gray-900 mb-1">Industry</h4>
-                <p className="text-sm text-gray-600">{company.industry}</p>
+          <div className="mt-6 pt-6 border-t border-gray-100 space-y-4 bg-gray-50 -mx-6 -mb-6 px-6 pb-6 rounded-b-lg">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-3">
+                <div>
+                  <h4 className="text-sm font-semibold text-gray-900 mb-1">Full Description</h4>
+                  <p className="text-sm text-gray-600 bg-white p-3 rounded border">{company.description}</p>
+                </div>
+                
+                {company.industry && (
+                  <div>
+                    <h4 className="text-sm font-semibold text-gray-900 mb-1">Industry</h4>
+                    <p className="text-sm text-gray-600">{company.industry}</p>
+                  </div>
+                )}
               </div>
-            )}
-            
-            {company.size && (
-              <div>
-                <h4 className="text-sm font-medium text-gray-900 mb-1">Company Size</h4>
-                <p className="text-sm text-gray-600">{company.size}</p>
-              </div>
-            )}
-            
-            <div>
-              <h4 className="text-sm font-medium text-gray-900 mb-1">Owner Information</h4>
-              <p className="text-sm text-gray-600">
-                {company.user?.username} ({company.user?.email})
-              </p>
-            </div>
+              
+              <div className="space-y-3">
+                {company.size && (
+                  <div>
+                    <h4 className="text-sm font-semibold text-gray-900 mb-1">Company Size</h4>
+                    <p className="text-sm text-gray-600">{company.size}</p>
+                  </div>
+                )}
+                
+                <div>
+                  <h4 className="text-sm font-semibold text-gray-900 mb-1">Owner Information</h4>
+                  <div className="text-sm text-gray-600 bg-white p-3 rounded border">
+                    <div><strong>Name:</strong> {company.user?.username}</div>
+                    <div><strong>Email:</strong> {company.user?.email}</div>
+                  </div>
+                </div>
 
-            <div>
-              <h4 className="text-sm font-medium text-gray-900 mb-1">Submission Date</h4>
-              <p className="text-sm text-gray-600">{formatDate(company.created_at)}</p>
+                <div>
+                  <h4 className="text-sm font-semibold text-gray-900 mb-1">Submission Date</h4>
+                  <p className="text-sm text-gray-600">{formatDate(company.created_at)}</p>
+                </div>
+              </div>
             </div>
           </div>
         )}
-      </div>
-    </div>
+      </CardContent>
+    </Card>
   )
 }
 
@@ -244,11 +261,13 @@ const CompanyModerationPage = () => {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gray-50 py-8">
-        <div className="container mx-auto px-4">
-          <div className="flex items-center justify-center py-12">
-            <Loader2 className="h-8 w-8 animate-spin text-primary-600" />
-            <span className="ml-2 text-gray-600">Loading companies...</span>
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 py-8">
+        <div className="container mx-auto px-6 max-w-7xl">
+          <div className="flex items-center justify-center py-20">
+            <div className="text-center">
+              <Loader2 className="h-12 w-12 animate-spin text-blue-600 mx-auto mb-4" />
+              <p className="text-lg text-gray-600">Loading companies...</p>
+            </div>
           </div>
         </div>
       </div>
@@ -257,139 +276,179 @@ const CompanyModerationPage = () => {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-gray-50 py-8">
-        <div className="container mx-auto px-4">
-          <div className="bg-red-50 border border-red-200 rounded-lg p-6 text-center">
-            <AlertCircle className="h-12 w-12 text-red-600 mx-auto mb-4" />
-            <h2 className="text-lg font-medium text-red-800 mb-2">Error Loading Companies</h2>
-            <p className="text-red-600">Failed to load company data. Please try again later.</p>
-            <button onClick={handleRefresh} className="mt-4 btn-primary">
-              Try Again
-            </button>
-          </div>
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 py-8">
+        <div className="container mx-auto px-6 max-w-7xl">
+          <Card className="border-red-200 bg-red-50">
+            <CardContent className="p-8 text-center">
+              <AlertCircle className="h-16 w-16 text-red-600 mx-auto mb-6" />
+              <h2 className="text-lg font-medium text-red-800 mb-2">Error Loading Companies</h2>
+              <p className="text-red-600 mb-4">Failed to load company data. Please try again later.</p>
+              <Button onClick={handleRefresh} variant="outline">
+                Try Again
+              </Button>
+            </CardContent>
+          </Card>
         </div>
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
-      <div className="container mx-auto px-4">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 py-8">
+      <div className="container mx-auto px-6 max-w-7xl">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Company Moderation</h1>
-          <p className="text-gray-600">
+          <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-3">
+            Company Moderation
+          </h1>
+          <p className="text-lg text-gray-600">
             Review and moderate company listings submitted by business owners
           </p>
         </div>
 
-        {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
-          <div className="bg-white rounded-lg border border-gray-200 p-6">
-            <div className="flex items-center">
-              <Clock className="h-8 w-8 text-yellow-600" />
-              <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600">Pending Review</p>
-                <p className="text-2xl font-bold text-gray-900">{statusCounts.pending || 0}</p>
+        {/* Stats Dashboard */}
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+          <Card className="border-0 shadow-lg bg-gradient-to-br from-yellow-50 to-orange-50">
+            <CardContent className="p-6">
+              <div className="flex items-center">
+                <div className="w-12 h-12 bg-gradient-to-br from-yellow-500 to-orange-500 rounded-lg flex items-center justify-center shadow-sm">
+                  <Clock className="h-6 w-6 text-white" />
+                </div>
+                <div className="ml-4">
+                  <p className="text-sm font-medium text-gray-600">Pending Review</p>
+                  <p className="text-3xl font-bold text-gray-900">{statusCounts.pending || 0}</p>
+                  <div className="flex items-center text-sm text-yellow-600 mt-1">
+                    <TrendingUp className="h-3 w-3 mr-1" />
+                    <span>Awaiting action</span>
+                  </div>
+                </div>
               </div>
-            </div>
-          </div>
+            </CardContent>
+          </Card>
           
-          <div className="bg-white rounded-lg border border-gray-200 p-6">
-            <div className="flex items-center">
-              <CheckCircle className="h-8 w-8 text-green-600" />
-              <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600">Approved</p>
-                <p className="text-2xl font-bold text-gray-900">{statusCounts.approved || 0}</p>
+          <Card className="border-0 shadow-lg bg-gradient-to-br from-green-50 to-emerald-50">
+            <CardContent className="p-6">
+              <div className="flex items-center">
+                <div className="w-12 h-12 bg-gradient-to-br from-green-500 to-emerald-500 rounded-lg flex items-center justify-center shadow-sm">
+                  <CheckCircle className="h-6 w-6 text-white" />
+                </div>
+                <div className="ml-4">
+                  <p className="text-sm font-medium text-gray-600">Approved</p>
+                  <p className="text-3xl font-bold text-gray-900">{statusCounts.approved || 0}</p>
+                  <div className="flex items-center text-sm text-green-600 mt-1">
+                    <Store className="h-3 w-3 mr-1" />
+                    <span>Active listings</span>
+                  </div>
+                </div>
               </div>
-            </div>
-          </div>
+            </CardContent>
+          </Card>
           
-          <div className="bg-white rounded-lg border border-gray-200 p-6">
-            <div className="flex items-center">
-              <XCircle className="h-8 w-8 text-red-600" />
-              <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600">Rejected</p>
-                <p className="text-2xl font-bold text-gray-900">{statusCounts.rejected || 0}</p>
+          <Card className="border-0 shadow-lg bg-gradient-to-br from-red-50 to-pink-50">
+            <CardContent className="p-6">
+              <div className="flex items-center">
+                <div className="w-12 h-12 bg-gradient-to-br from-red-500 to-pink-500 rounded-lg flex items-center justify-center shadow-sm">
+                  <XCircle className="h-6 w-6 text-white" />
+                </div>
+                <div className="ml-4">
+                  <p className="text-sm font-medium text-gray-600">Rejected</p>
+                  <p className="text-3xl font-bold text-gray-900">{statusCounts.rejected || 0}</p>
+                  <div className="flex items-center text-sm text-red-600 mt-1">
+                    <X className="h-3 w-3 mr-1" />
+                    <span>Declined</span>
+                  </div>
+                </div>
               </div>
-            </div>
-          </div>
+            </CardContent>
+          </Card>
           
-          <div className="bg-white rounded-lg border border-gray-200 p-6">
-            <div className="flex items-center">
-              <Building2 className="h-8 w-8 text-blue-600" />
-              <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600">Total</p>
-                <p className="text-2xl font-bold text-gray-900">{companies.length}</p>
+          <Card className="border-0 shadow-lg bg-gradient-to-br from-blue-50 to-indigo-50">
+            <CardContent className="p-6">
+              <div className="flex items-center">
+                <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-indigo-500 rounded-lg flex items-center justify-center shadow-sm">
+                  <Building2 className="h-6 w-6 text-white" />
+                </div>
+                <div className="ml-4">
+                  <p className="text-sm font-medium text-gray-600">Total Companies</p>
+                  <p className="text-3xl font-bold text-gray-900">{companies.length}</p>
+                  <div className="flex items-center text-sm text-blue-600 mt-1">
+                    <Users className="h-3 w-3 mr-1" />
+                    <span>All submissions</span>
+                  </div>
+                </div>
               </div>
-            </div>
-          </div>
+            </CardContent>
+          </Card>
         </div>
 
         {/* Search and Filters */}
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
-          <div className="flex flex-col md:flex-row md:items-center md:justify-between space-y-4 md:space-y-0 md:space-x-4">
-            <div className="flex-1 max-w-md">
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-                <input
-                  type="text"
-                  placeholder="Search companies by name..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none"
-                />
-              </div>
-            </div>
-            
-            <div className="flex items-center space-x-4">
-              <div className="flex items-center space-x-2">
-                <Filter className="h-4 w-4 text-gray-400" />
-                <select
-                  value={statusFilter}
-                  onChange={(e) => setStatusFilter(e.target.value)}
-                  className="border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none"
-                >
-                  <option value="">All Status</option>
-                  <option value="pending">Pending</option>
-                  <option value="approved">Approved</option>
-                  <option value="rejected">Rejected</option>
-                </select>
+        <Card className="border-0 shadow-lg mb-8">
+          <CardContent className="p-6">
+            <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
+              <div className="flex-1 max-w-md">
+                <div className="relative">
+                  <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+                  <input
+                    type="text"
+                    placeholder="Search companies by name..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="w-full pl-12 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all bg-gray-50 focus:bg-white"
+                  />
+                </div>
               </div>
               
-              <button
-                onClick={handleRefresh}
-                className="btn-primary"
-              >
-                Refresh
-              </button>
+              <div className="flex items-center gap-4">
+                <div className="flex items-center gap-2">
+                  <Filter className="h-5 w-5 text-gray-400" />
+                  <select
+                    value={statusFilter}
+                    onChange={(e) => setStatusFilter(e.target.value)}
+                    className="border border-gray-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all bg-gray-50 focus:bg-white"
+                  >
+                    <option value="">All Status</option>
+                    <option value="pending">Pending</option>
+                    <option value="approved">Approved</option>
+                    <option value="rejected">Rejected</option>
+                  </select>
+                </div>
+                
+                <Button
+                  onClick={handleRefresh}
+                  variant="outline"
+                  className="bg-white hover:bg-gray-50"
+                >
+                  Refresh
+                </Button>
+              </div>
             </div>
-          </div>
-        </div>
+          </CardContent>
+        </Card>
 
-        {/* Companies Grid */}
-        {companies.length > 0 ? (
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            {companies.map((company) => (
-              <CompanyCard 
-                key={company.id} 
-                company={company} 
+        {/* Companies List */}
+        <div className="space-y-6">
+          {companies.length === 0 ? (
+            <Card className="border-0 shadow-lg">
+              <CardContent className="p-12 text-center">
+                <Building2 className="h-16 w-16 text-gray-300 mx-auto mb-4" />
+                <h3 className="text-xl font-semibold text-gray-900 mb-2">No companies found</h3>
+                <p className="text-gray-500">
+                  {searchTerm || statusFilter
+                    ? 'Try adjusting your search or filter criteria.'
+                    : 'No companies have been submitted yet.'}
+                </p>
+              </CardContent>
+            </Card>
+          ) : (
+            companies.map((company) => (
+              <CompanyCard
+                key={company.id}
+                company={company}
                 onUpdate={handleRefresh}
               />
-            ))}
-          </div>
-        ) : (
-          <div className="bg-white rounded-lg border border-gray-200 text-center py-12">
-            <Building2 className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-            <h3 className="text-lg font-medium text-gray-900 mb-2">No Companies Found</h3>
-            <p className="text-gray-600">
-              {searchTerm || statusFilter 
-                ? 'No companies match your current filters.' 
-                : 'No companies have been submitted for review yet.'
-              }
-            </p>
-          </div>
-        )}
+            ))
+          )}
+        </div>
       </div>
     </div>
   )

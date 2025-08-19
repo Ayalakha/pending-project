@@ -329,13 +329,16 @@ const AdminDashboard = () => {
             </div>
           </Link>
 
-          <div className="block p-4 border border-gray-200 rounded-lg opacity-50 cursor-not-allowed">
+          <Link 
+            to="/admin/content-moderation" 
+            className="block p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors group"
+          >
             <div className="text-center">
-              <FileText className="h-8 w-8 text-gray-400 mx-auto mb-2" />
-              <p className="font-medium text-gray-700">Content Moderation</p>
-              <p className="text-sm text-gray-500">Coming Soon</p>
+              <FileText className="h-8 w-8 text-gray-600 group-hover:text-purple-600 mx-auto mb-2 transition-colors" />
+              <p className="font-medium text-gray-900">Content Moderation</p>
+              <p className="text-sm text-gray-600">Review blogs, comments & reviews</p>
             </div>
-          </div>
+          </Link>
 
           <Link 
             to="/admin/analytics" 

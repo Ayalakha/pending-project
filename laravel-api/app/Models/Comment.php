@@ -13,6 +13,10 @@ class Comment extends Model
         'content',
         'user_id',
         'blog_id',
+        'status',
+        'moderation_notes',
+        'moderated_by',
+        'moderated_at',
     ];
 
     // Relationships
@@ -29,6 +33,11 @@ class Comment extends Model
     public function blog()
     {
         return $this->belongsTo(Blog::class);
+    }
+
+    public function moderatedBy()
+    {
+        return $this->belongsTo(User::class, 'moderated_by');
     }
 
     // Helper methods

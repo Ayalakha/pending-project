@@ -69,6 +69,12 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::put('/blogs/{blog}', [BlogController::class, 'update']);
         Route::delete('/blogs/{blog}', [BlogController::class, 'destroy']);
         
+        // Content Moderation
+        Route::get('/admin/content', [App\Http\Controllers\Admin\ContentModerationController::class, 'index']);
+        Route::post('/admin/content/moderate', [App\Http\Controllers\Admin\ContentModerationController::class, 'moderate']);
+        Route::get('/admin/content/{type}/{id}', [App\Http\Controllers\Admin\ContentModerationController::class, 'show']);
+        Route::get('/admin/content/stats', [App\Http\Controllers\Admin\ContentModerationController::class, 'stats']);
+        
         Route::get('/admin/users', function () {
             return response()->json(['message' => 'Admin users list']);
         });
