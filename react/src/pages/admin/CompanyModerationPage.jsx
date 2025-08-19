@@ -29,6 +29,9 @@ import { Badge } from '../../components/ui/badge'
 
 const CompanyCard = ({ company, onUpdate }) => {
   const [showDetails, setShowDetails] = useState(false)
+  const [showApproveModal, setShowApproveModal] = useState(false)
+  const [showRejectModal, setShowRejectModal] = useState(false)
+  const [rejectionReason, setRejectionReason] = useState('')
   const queryClient = useQueryClient()
 
   const approveMutation = useMutation({
@@ -36,6 +39,7 @@ const CompanyCard = ({ company, onUpdate }) => {
     onSuccess: () => {
       queryClient.invalidateQueries(['adminCompanies'])
       onUpdate()
+      setShowApproveModal(false)
     }
   })
 
@@ -44,20 +48,17 @@ const CompanyCard = ({ company, onUpdate }) => {
     onSuccess: () => {
       queryClient.invalidateQueries(['adminCompanies'])
       onUpdate()
+      setShowRejectModal(false)
+      setRejectionReason('')
     }
   })
 
   const handleApprove = () => {
-    if (window.confirm(`Approve "${company.name}" for listing?`)) {
-      approveMutation.mutate(company.id)
-    }
+    approveMutation.mutate(company.id)
   }
 
   const handleReject = () => {
-    const reason = prompt('Reason for rejection (optional):')
-    if (reason !== null) { // User didn't cancel
-      rejectMutation.mutate({ companyId: company.id, reason })
-    }
+    rejectMutation.mutate({ companyId: company.id, reason: rejectionReason })
   }
 
   const getStatusBadge = (status) => {
@@ -151,7 +152,7 @@ const CompanyCard = ({ company, onUpdate }) => {
               <Button
                 variant="destructive"
                 size="sm"
-                onClick={handleReject}
+                onClick={() => setShowRejectModal(true)}
                 disabled={rejectMutation.isLoading}
                 className="shadow-sm"
               >
@@ -164,7 +165,7 @@ const CompanyCard = ({ company, onUpdate }) => {
               </Button>
               <Button
                 size="sm"
-                onClick={handleApprove}
+                onClick={() => setShowApproveModal(true)}
                 disabled={approveMutation.isLoading}
                 className="bg-green-600 hover:bg-green-700 shadow-sm"
               >
@@ -217,6 +218,110 @@ const CompanyCard = ({ company, onUpdate }) => {
                   <h4 className="text-sm font-semibold text-gray-900 mb-1">Submission Date</h4>
                   <p className="text-sm text-gray-600">{formatDate(company.created_at)}</p>
                 </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Approve Modal */}
+        {showApproveModal && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+            <div className="bg-white rounded-xl p-6 max-w-md w-full shadow-2xl transform transition-all">
+              <div className="text-center mb-6">
+                <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <Check className="h-8 w-8 text-green-600" />
+                </div>
+                <h3 className="text-xl font-bold text-gray-900 mb-2">Approve Company</h3>
+                <p className="text-gray-600">
+                  Are you sure you want to approve <strong>"{company.name}"</strong> for listing?
+                </p>
+              </div>
+
+              <div className="flex gap-3 justify-end">
+                <Button
+                  onClick={() => setShowApproveModal(false)}
+                  variant="outline"
+                  disabled={approveMutation.isLoading}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  onClick={handleApprove}
+                  disabled={approveMutation.isLoading}
+                  className="bg-green-600 hover:bg-green-700"
+                >
+                  {approveMutation.isLoading ? (
+                    <>
+                      <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                      Approving...
+                    </>
+                  ) : (
+                    <>
+                      <Check className="h-4 w-4 mr-2" />
+                      Approve
+                    </>
+                  )}
+                </Button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Reject Modal */}
+        {showRejectModal && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+            <div className="bg-white rounded-xl p-6 max-w-md w-full shadow-2xl transform transition-all">
+              <div className="text-center mb-6">
+                <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <X className="h-8 w-8 text-red-600" />
+                </div>
+                <h3 className="text-xl font-bold text-gray-900 mb-2">Reject Company</h3>
+                <p className="text-gray-600 mb-4">
+                  Are you sure you want to reject <strong>"{company.name}"</strong>?
+                </p>
+                
+                <div className="text-left">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Reason for rejection (optional):
+                  </label>
+                  <textarea
+                    value={rejectionReason}
+                    onChange={(e) => setRejectionReason(e.target.value)}
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none resize-none"
+                    rows="3"
+                    placeholder="Provide a reason for the rejection..."
+                  />
+                </div>
+              </div>
+
+              <div className="flex gap-3 justify-end">
+                <Button
+                  onClick={() => {
+                    setShowRejectModal(false)
+                    setRejectionReason('')
+                  }}
+                  variant="outline"
+                  disabled={rejectMutation.isLoading}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  onClick={handleReject}
+                  disabled={rejectMutation.isLoading}
+                  variant="destructive"
+                >
+                  {rejectMutation.isLoading ? (
+                    <>
+                      <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                      Rejecting...
+                    </>
+                  ) : (
+                    <>
+                      <X className="h-4 w-4 mr-2" />
+                      Reject
+                    </>
+                  )}
+                </Button>
               </div>
             </div>
           </div>

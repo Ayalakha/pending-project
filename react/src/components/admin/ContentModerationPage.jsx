@@ -16,6 +16,8 @@ const ContentModerationPage = () => {
   });
   const [selectedContent, setSelectedContent] = useState(null);
   const [moderationNotes, setModerationNotes] = useState('');
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
+  const [pendingAction, setPendingAction] = useState(null);
   const { token } = useAuth();
 
   useEffect(() => {
@@ -62,10 +64,23 @@ const ContentModerationPage = () => {
       
       setSelectedContent(null);
       setModerationNotes('');
+      setShowConfirmModal(false);
+      setPendingAction(null);
     } catch (error) {
       console.error('Error moderating content:', error);
     } finally {
       setModerating(prev => ({ ...prev, [key]: false }));
+    }
+  };
+
+  const showConfirmation = (action) => {
+    setPendingAction(action);
+    setShowConfirmModal(true);
+  };
+
+  const confirmAction = () => {
+    if (pendingAction && selectedContent) {
+      handleModerate(selectedContent, pendingAction);
     }
   };
 
@@ -508,7 +523,7 @@ const ContentModerationPage = () => {
                     Cancel
                   </Button>
                   <Button
-                    onClick={() => handleModerate(selectedContent, 'reject')}
+                    onClick={() => showConfirmation('reject')}
                     variant="destructive"
                     disabled={moderating[`${selectedContent.type}-${selectedContent.id}`]}
                     className="px-8 py-3 bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white font-medium rounded-xl shadow-lg hover:shadow-xl transition-all duration-200"
@@ -516,13 +531,67 @@ const ContentModerationPage = () => {
                     {moderating[`${selectedContent.type}-${selectedContent.id}`] ? '🔄 Processing...' : '❌ Reject'}
                   </Button>
                   <Button
-                    onClick={() => handleModerate(selectedContent, 'approve')}
+                    onClick={() => showConfirmation('approve')}
                     disabled={moderating[`${selectedContent.type}-${selectedContent.id}`]}
                     className="px-8 py-3 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-medium rounded-xl shadow-lg hover:shadow-xl transition-all duration-200"
                   >
                     {moderating[`${selectedContent.type}-${selectedContent.id}`] ? '🔄 Processing...' : '✅ Approve'}
                   </Button>
                 </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Confirmation Modal */}
+        {showConfirmModal && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-[60]">
+            <div className="bg-white rounded-2xl p-8 max-w-md w-full shadow-2xl transform transition-all">
+              <div className="text-center mb-6">
+                <div className={`w-20 h-20 ${pendingAction === 'approve' ? 'bg-green-100' : 'bg-red-100'} rounded-full flex items-center justify-center mx-auto mb-4`}>
+                  <span className="text-3xl">
+                    {pendingAction === 'approve' ? '✅' : '❌'}
+                  </span>
+                </div>
+                <h3 className="text-2xl font-bold text-gray-900 mb-3">
+                  {pendingAction === 'approve' ? 'Approve Content' : 'Reject Content'}
+                </h3>
+                <p className="text-gray-600 text-lg">
+                  Are you sure you want to {pendingAction} this {selectedContent?.type}?
+                </p>
+                <div className="mt-4 p-4 bg-gray-50 rounded-xl text-left">
+                  <p className="font-semibold text-gray-800 mb-1">"{selectedContent?.title}"</p>
+                  <p className="text-sm text-gray-600">by {selectedContent?.author}</p>
+                </div>
+              </div>
+
+              <div className="flex gap-4 justify-center">
+                <Button
+                  onClick={() => {
+                    setShowConfirmModal(false);
+                    setPendingAction(null);
+                  }}
+                  variant="outline"
+                  className="px-8 py-3 border-2 border-gray-300 hover:border-gray-400 rounded-xl font-medium"
+                  disabled={moderating[`${selectedContent?.type}-${selectedContent?.id}`]}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  onClick={confirmAction}
+                  className={`px-8 py-3 font-medium rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 ${
+                    pendingAction === 'approve' 
+                      ? 'bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white' 
+                      : 'bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white'
+                  }`}
+                  disabled={moderating[`${selectedContent?.type}-${selectedContent?.id}`]}
+                >
+                  {moderating[`${selectedContent?.type}-${selectedContent?.id}`] ? (
+                    <>🔄 Processing...</>
+                  ) : (
+                    <>{pendingAction === 'approve' ? '✅ Confirm Approval' : '❌ Confirm Rejection'}</>
+                  )}
+                </Button>
               </div>
             </div>
           </div>
