@@ -113,12 +113,12 @@ const AdminDashboard = () => {
             </div>
           </div>
           <div className="flex items-center space-x-3">
-            {stats.pendingApprovals > 0 && (
+            {/* {stats.pendingApprovals > 0 && (
               <div className="flex items-center px-3 py-1 bg-orange-100 text-orange-800 rounded-full text-sm">
                 <AlertTriangle className="h-4 w-4 mr-1" />
                 {stats.pendingApprovals} pending
               </div>
-            )}
+            )} */}
             <button 
               onClick={() => setShowSettings(true)}
               className="btn-primary flex items-center"
