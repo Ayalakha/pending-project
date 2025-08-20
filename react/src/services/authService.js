@@ -113,6 +113,12 @@ export const authService = {
     return response.data
   },
 
+  // Change password
+  changePassword: async (passwordData) => {
+    const response = await api.post('/auth/change-password', passwordData)
+    return response.data
+  },
+
   // Request password reset
   requestPasswordReset: async (email) => {
     const response = await api.post('/auth/password/reset', { email })

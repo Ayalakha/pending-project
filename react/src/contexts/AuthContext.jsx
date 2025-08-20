@@ -133,6 +133,11 @@ export const AuthProvider = ({ children }) => {
     }
   }
 
+  // Direct user update function for context
+  const updateUserContext = (updatedUser) => {
+    setUser(updatedUser)
+  }
+
   // Check if user has specific role
   const hasRole = (role) => {
     return user?.role === role
@@ -152,6 +157,7 @@ export const AuthProvider = ({ children }) => {
     register,
     logout,
     updateProfile,
+    updateUserContext,
     hasRole,
     isOwner,
     isSuperAdmin
