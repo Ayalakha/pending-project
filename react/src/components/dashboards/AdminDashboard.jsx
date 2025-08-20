@@ -335,8 +335,8 @@ const AdminDashboard = () => {
           >
             <div className="text-center">
               <FileText className="h-8 w-8 text-gray-600 group-hover:text-purple-600 mx-auto mb-2 transition-colors" />
-              <p className="font-medium text-gray-900">Content Moderation</p>
-              <p className="text-sm text-gray-600">Review blogs, comments & reviews</p>
+              <p className="font-medium text-gray-900">Blog Moderation</p>
+              <p className="text-sm text-gray-600">Review and moderate blog posts</p>
             </div>
           </Link>
 

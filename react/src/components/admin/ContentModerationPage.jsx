@@ -11,7 +11,7 @@ const ContentModerationPage = () => {
   const [loading, setLoading] = useState(true);
   const [moderating, setModerating] = useState({});
   const [filters, setFilters] = useState({
-    type: 'all',
+    type: 'blogs',
     status: 'pending'
   });
   const [selectedContent, setSelectedContent] = useState(null);
@@ -122,26 +122,26 @@ const ContentModerationPage = () => {
         {/* Header Section */}
         <div className="text-center mb-8">
           <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-purple-600 to-blue-600 rounded-full mb-4 shadow-lg">
-            <span className="text-2xl">🛡️</span>
+            <span className="text-2xl">�</span>
           </div>
           <h1 className="text-4xl font-bold bg-gradient-to-r from-gray-900 to-gray-600 bg-clip-text text-transparent mb-2">
-            Content Moderation
+            Blog Moderation
           </h1>
           <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-            Review and moderate user-generated content with advanced filtering and bulk actions
+            Review and moderate blog posts with advanced filtering and approval workflow
           </p>
         </div>
 
         {/* Stats Dashboard */}
         {stats && (
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden hover:shadow-xl transition-all duration-300">
               <div className="bg-gradient-to-r from-blue-500 to-blue-600 p-1">
                 <div className="bg-white m-1 rounded-xl p-6">
                   <div className="flex items-center justify-between mb-4">
                     <h3 className="font-bold text-xl text-gray-800 flex items-center">
                       <span className="text-2xl mr-3">📝</span>
-                      Blogs
+                      Blog Posts
                     </h3>
                     <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
                       <span className="text-blue-600 font-bold">{stats.blogs.total}</span>
@@ -149,7 +149,7 @@ const ContentModerationPage = () => {
                   </div>
                   <div className="space-y-3">
                     <div className="flex justify-between items-center p-2 bg-amber-50 rounded-lg">
-                      <span className="text-sm font-medium text-gray-700">Pending</span>
+                      <span className="text-sm font-medium text-gray-700">Pending Review</span>
                       <Badge variant="warning" className="bg-amber-100 text-amber-800 border-amber-200">
                         {stats.blogs.pending}
                       </Badge>
@@ -172,72 +172,38 @@ const ContentModerationPage = () => {
             </div>
 
             <div className="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden hover:shadow-xl transition-all duration-300">
-              <div className="bg-gradient-to-r from-green-500 to-green-600 p-1">
-                <div className="bg-white m-1 rounded-xl p-6">
-                  <div className="flex items-center justify-between mb-4">
-                    <h3 className="font-bold text-xl text-gray-800 flex items-center">
-                      <span className="text-2xl mr-3">💬</span>
-                      Comments
-                    </h3>
-                    <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
-                      <span className="text-green-600 font-bold">{stats.comments.total}</span>
-                    </div>
-                  </div>
-                  <div className="space-y-3">
-                    <div className="flex justify-between items-center p-2 bg-amber-50 rounded-lg">
-                      <span className="text-sm font-medium text-gray-700">Pending</span>
-                      <Badge variant="warning" className="bg-amber-100 text-amber-800 border-amber-200">
-                        {stats.comments.pending}
-                      </Badge>
-                    </div>
-                    <div className="flex justify-between items-center p-2 bg-green-50 rounded-lg">
-                      <span className="text-sm font-medium text-gray-700">Approved</span>
-                      <Badge variant="success" className="bg-green-100 text-green-800 border-green-200">
-                        {stats.comments.approved}
-                      </Badge>
-                    </div>
-                    <div className="flex justify-between items-center p-2 bg-red-50 rounded-lg">
-                      <span className="text-sm font-medium text-gray-700">Rejected</span>
-                      <Badge variant="destructive" className="bg-red-100 text-red-800 border-red-200">
-                        {stats.comments.rejected}
-                      </Badge>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div className="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden hover:shadow-xl transition-all duration-300">
               <div className="bg-gradient-to-r from-purple-500 to-purple-600 p-1">
                 <div className="bg-white m-1 rounded-xl p-6">
                   <div className="flex items-center justify-between mb-4">
                     <h3 className="font-bold text-xl text-gray-800 flex items-center">
-                      <span className="text-2xl mr-3">⭐</span>
-                      Reviews
+                      <span className="text-2xl mr-3">⚡</span>
+                      Quick Actions
                     </h3>
-                    <div className="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center">
-                      <span className="text-purple-600 font-bold">{stats.reviews.total}</span>
-                    </div>
                   </div>
                   <div className="space-y-3">
-                    <div className="flex justify-between items-center p-2 bg-amber-50 rounded-lg">
-                      <span className="text-sm font-medium text-gray-700">Pending</span>
-                      <Badge variant="warning" className="bg-amber-100 text-amber-800 border-amber-200">
-                        {stats.reviews.pending}
-                      </Badge>
-                    </div>
-                    <div className="flex justify-between items-center p-2 bg-green-50 rounded-lg">
-                      <span className="text-sm font-medium text-gray-700">Approved</span>
-                      <Badge variant="success" className="bg-green-100 text-green-800 border-green-200">
-                        {stats.reviews.approved}
-                      </Badge>
-                    </div>
-                    <div className="flex justify-between items-center p-2 bg-red-50 rounded-lg">
-                      <span className="text-sm font-medium text-gray-700">Rejected</span>
-                      <Badge variant="destructive" className="bg-red-100 text-red-800 border-red-200">
-                        {stats.reviews.rejected}
-                      </Badge>
-                    </div>
+                    <Button 
+                      className="w-full bg-green-500 hover:bg-green-600 text-white"
+                      onClick={() => setFilters(prev => ({ ...prev, status: 'pending' }))}
+                    >
+                      <span className="mr-2">✅</span>
+                      Review Pending ({stats.blogs.pending})
+                    </Button>
+                    <Button 
+                      variant="outline" 
+                      className="w-full"
+                      onClick={() => setFilters(prev => ({ ...prev, status: 'all' }))}
+                    >
+                      <span className="mr-2">📋</span>
+                      View All Posts
+                    </Button>
+                    <Button 
+                      variant="outline" 
+                      className="w-full"
+                      onClick={() => window.location.reload()}
+                    >
+                      <span className="mr-2">🔄</span>
+                      Refresh Data
+                    </Button>
                   </div>
                 </div>
               </div>
@@ -257,7 +223,7 @@ const ContentModerationPage = () => {
                 onChange={(e) => setFilters(prev => ({ ...prev, type: e.target.value }))}
                 className="w-full border-2 border-gray-200 rounded-xl px-4 py-3 bg-white focus:border-blue-500 focus:ring-0 transition-colors duration-200 text-gray-700 font-medium"
               >
-                <option value="all">🌐 All Content</option>
+                <option value="blogs">📝 Blog Posts Only</option>
                 <option value="blogs">📝 Blogs</option>
                 <option value="comments">💬 Comments</option>
                 <option value="reviews">⭐ Reviews</option>
@@ -280,7 +246,7 @@ const ContentModerationPage = () => {
             </div>
             <div className="flex gap-3">
               <Button
-                onClick={() => setFilters({ type: 'all', status: 'pending' })}
+                onClick={() => setFilters({ type: 'blogs', status: 'pending' })}
                 variant="outline"
                 className="border-2 border-gray-200 hover:border-blue-300 hover:bg-blue-50 transition-all duration-200"
               >
