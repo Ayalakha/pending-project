@@ -28,7 +28,7 @@ class CompanyController extends Controller
             });
         }
 
-        $companies = $query->paginate(10);
+        $companies = $query->paginate(20);
 
         return response()->json([
             'status' => 'success',

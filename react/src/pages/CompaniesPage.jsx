@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query'
 import { companyService } from '../services/companyService'
 import StarRating from '../components/reviews/StarRating'
-import { Building2, MapPin, Phone, Globe, Users, Loader2, Search, X, ArrowRight, Star, Filter } from 'lucide-react'
+import { Building2, MapPin, Phone, Globe, Users, Loader2, Search, X, ArrowRight, Star, Filter, ChevronLeft, ChevronRight } from 'lucide-react'
 import { Link, useSearchParams } from 'react-router-dom'
 import { useState, useEffect } from 'react'
 
@@ -94,18 +94,26 @@ const CompanyCard = ({ company }) => {
 const CompaniesPage = () => {
   const [searchParams, setSearchParams] = useSearchParams()
   const [localSearch, setLocalSearch] = useState('')
+  const [currentPage, setCurrentPage] = useState(1)
   const searchQuery = searchParams.get('search') || ''
+  const pageFromUrl = parseInt(searchParams.get('page')) || 1
 
   // Sync local search with URL search params
   useEffect(() => {
     console.log('URL search params changed:', searchQuery)
     console.log('Current full URL:', window.location.href)
     setLocalSearch(searchQuery)
-  }, [searchQuery])
+    setCurrentPage(pageFromUrl)
+  }, [searchQuery, pageFromUrl])
 
   const { data, isLoading, error } = useQuery({
-    queryKey: ['companies', searchQuery],
-    queryFn: () => companyService.getCompanies(searchQuery ? { search: searchQuery } : {}),
+    queryKey: ['companies', searchQuery, currentPage],
+    queryFn: () => {
+      const params = {}
+      if (searchQuery) params.search = searchQuery
+      if (currentPage > 1) params.page = currentPage
+      return companyService.getCompanies(params)
+    },
   })
 
   const handleSearch = (e) => {
@@ -113,17 +121,17 @@ const CompaniesPage = () => {
     console.log('Search submitted:', localSearch.trim())
     console.log('Current URL:', window.location.href)
     
+    setCurrentPage(1) // Reset to first page when searching
+    
     if (localSearch.trim()) {
       // Update URL with search parameter
-      const newParams = new URLSearchParams(searchParams)
+      const newParams = new URLSearchParams()
       newParams.set('search', localSearch.trim())
       setSearchParams(newParams)
       console.log('Setting search params to:', newParams.toString())
     } else {
       // Clear search if empty
-      const newParams = new URLSearchParams(searchParams)
-      newParams.delete('search')
-      setSearchParams(newParams)
+      setSearchParams({})
       console.log('Clearing search params')
     }
   }
@@ -131,10 +139,24 @@ const CompaniesPage = () => {
   const clearSearch = () => {
     console.log('Clearing search')
     setLocalSearch('')
+    setCurrentPage(1)
     const newParams = new URLSearchParams(searchParams)
     newParams.delete('search')
+    newParams.delete('page')
     setSearchParams(newParams)
     console.log('Search cleared, new URL should be:', window.location.pathname)
+  }
+
+  const handlePageChange = (page) => {
+    setCurrentPage(page)
+    const newParams = new URLSearchParams(searchParams)
+    if (page > 1) {
+      newParams.set('page', page.toString())
+    } else {
+      newParams.delete('page')
+    }
+    setSearchParams(newParams)
+    window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
   if (isLoading) {
@@ -181,6 +203,110 @@ const CompaniesPage = () => {
   }
 
   const companies = data?.companies?.data || data?.companies || []
+  const pagination = data?.companies?.current_page ? data.companies : null
+
+  // Pagination Component
+  const PaginationControls = () => {
+    if (!pagination || !pagination.last_page || pagination.last_page <= 1) return null
+
+    const currentPage = pagination.current_page
+    const lastPage = pagination.last_page
+    const hasNext = pagination.next_page_url
+    const hasPrev = pagination.prev_page_url
+
+    return (
+      <div className="flex items-center justify-center space-x-2 mt-12">
+        {/* Previous Button */}
+        <button
+          onClick={() => handlePageChange(currentPage - 1)}
+          disabled={!hasPrev}
+          className={`flex items-center px-4 py-2 rounded-lg font-medium transition-all duration-200 ${
+            hasPrev
+              ? 'bg-white border border-gray-200 text-gray-700 hover:bg-gray-50 hover:border-gray-300'
+              : 'bg-gray-100 text-gray-400 cursor-not-allowed'
+          }`}
+        >
+          <ChevronLeft className="w-4 h-4 mr-1" />
+          Previous
+        </button>
+
+        {/* Page Numbers */}
+        <div className="flex items-center space-x-1">
+          {/* First page */}
+          {currentPage > 2 && (
+            <>
+              <button
+                onClick={() => handlePageChange(1)}
+                className="w-10 h-10 rounded-lg font-medium text-gray-700 hover:bg-gray-100 transition-colors duration-200"
+              >
+                1
+              </button>
+              {currentPage > 3 && (
+                <span className="text-gray-400 px-2">...</span>
+              )}
+            </>
+          )}
+
+          {/* Previous page */}
+          {currentPage > 1 && (
+            <button
+              onClick={() => handlePageChange(currentPage - 1)}
+              className="w-10 h-10 rounded-lg font-medium text-gray-700 hover:bg-gray-100 transition-colors duration-200"
+            >
+              {currentPage - 1}
+            </button>
+          )}
+
+          {/* Current page */}
+          <button
+            className="w-10 h-10 rounded-lg font-medium bg-blue-600 text-white"
+            disabled
+          >
+            {currentPage}
+          </button>
+
+          {/* Next page */}
+          {currentPage < lastPage && (
+            <button
+              onClick={() => handlePageChange(currentPage + 1)}
+              className="w-10 h-10 rounded-lg font-medium text-gray-700 hover:bg-gray-100 transition-colors duration-200"
+            >
+              {currentPage + 1}
+            </button>
+          )}
+
+          {/* Last page */}
+          {currentPage < lastPage - 1 && (
+            <>
+              {currentPage < lastPage - 2 && (
+                <span className="text-gray-400 px-2">...</span>
+              )}
+              <button
+                onClick={() => handlePageChange(lastPage)}
+                className="w-10 h-10 rounded-lg font-medium text-gray-700 hover:bg-gray-100 transition-colors duration-200"
+              >
+                {lastPage}
+              </button>
+            </>
+          )}
+        </div>
+
+        {/* Next Button */}
+        <button
+          onClick={() => handlePageChange(currentPage + 1)}
+          disabled={!hasNext}
+          className={`flex items-center px-4 py-2 rounded-lg font-medium transition-all duration-200 ${
+            hasNext
+              ? 'bg-white border border-gray-200 text-gray-700 hover:bg-gray-50 hover:border-gray-300'
+              : 'bg-gray-100 text-gray-400 cursor-not-allowed'
+          }`}
+        >
+          Next
+          <ChevronRight className="w-4 h-4 ml-1" />
+        </button>
+      </div>
+    )
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 via-white to-gray-50">
@@ -191,7 +317,7 @@ const CompaniesPage = () => {
             {/* Simple Badge */}
             <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-blue-50 text-blue-600 text-sm font-medium mb-8">
               <Building2 className="w-4 h-4" />
-              <span>{companies.length} Companies</span>
+              <span>{pagination?.total || companies.length} Companies</span>
             </div>
 
             <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
@@ -288,7 +414,11 @@ const CompaniesPage = () => {
                     {searchQuery ? 'Search Results' : 'All Companies'}
                   </h2>
                   <p className="text-gray-600">
-                    Showing {companies.length} {companies.length === 1 ? 'company' : 'companies'}
+                    {pagination ? (
+                      <>Showing {pagination.from || 1}-{pagination.to || companies.length} of {pagination.total} companies</>
+                    ) : (
+                      <>Showing {companies.length} {companies.length === 1 ? 'company' : 'companies'}</>
+                    )}
                   </p>
                 </div>
                 
@@ -307,6 +437,9 @@ const CompaniesPage = () => {
                   <CompanyCard key={company.id} company={company} />
                 ))}
               </div>
+
+              {/* Pagination Controls */}
+              <PaginationControls />
             </>
           )}
         </div>
