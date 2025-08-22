@@ -215,6 +215,12 @@ const BlogDetailPage = () => {
     queryKey: ['blog-comments', id],
     queryFn: () => commentService.getBlogComments(id),
     enabled: !!id,
+    onSuccess: (data) => {
+      console.log('Comments data received:', data)
+    },
+    onError: (error) => {
+      console.error('Error fetching comments:', error)
+    }
   })
 
   const handleCommentUpdate = () => {
@@ -260,6 +266,11 @@ const BlogDetailPage = () => {
 
   const blog = blogData?.blog
   const comments = commentsData?.comments || []
+
+  console.log('Blog ID:', id)
+  console.log('Comments data:', commentsData)
+  console.log('Comments array:', comments)
+  console.log('Comments length:', comments.length)
 
   if (!blog) {
     return (

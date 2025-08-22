@@ -46,6 +46,7 @@ class CommentController extends Controller
             'content' => $request->input('content'),
             'blog_id' => $blog->id,
             'user_id' => $request->user()->id,
+            'status' => 'approved', // Auto-approve comments for now
         ]);
 
         $comment->load('user:id,name');

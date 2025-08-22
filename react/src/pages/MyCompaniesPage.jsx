@@ -10,7 +10,10 @@ import {
   Phone, 
   MapPin,
   Loader2,
-  AlertCircle
+  AlertCircle,
+  CheckCircle,
+  Calendar,
+  CreditCard
 } from 'lucide-react'
 import { Link, Navigate } from 'react-router-dom'
 import { useState } from 'react'
@@ -50,40 +53,88 @@ const CompanyCard = ({ company, onDelete }) => {
 
           {/* Company Info */}
           <div className="flex-1 min-w-0">
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">
-              {company.name}
-            </h3>
+            <div className="flex items-center mb-2">
+              <h3 className="text-lg font-semibold text-gray-900">
+                {company.name}
+              </h3>
+              {company.is_verified && (
+                <CheckCircle className="h-5 w-5 text-green-600 ml-2" title="Verified Company" />
+              )}
+            </div>
             <p className="text-gray-600 text-sm mb-3 line-clamp-2">
               {company.description || 'No description provided'}
             </p>
 
-            {/* Company Details */}
-            <div className="space-y-1">
-              {company.phone_number && (
-                <div className="flex items-center text-sm text-gray-500">
-                  <Phone className="h-4 w-4 mr-2" />
-                  {company.phone_number}
+            {/* Moroccan Company Details */}
+            <div className="space-y-2">
+              {/* Legal Form and Activity Sector */}
+              <div className="flex items-center justify-between text-sm">
+                <div className="flex items-center text-gray-600">
+                  <Building2 className="h-4 w-4 mr-2" />
+                  <span className="font-medium">{company.legal_form}</span>
+                  {company.activity_sector && (
+                    <>
+                      <span className="mx-2 text-gray-400">•</span>
+                      <span className="text-gray-500">{company.activity_sector}</span>
+                    </>
+                  )}
+                </div>
+                {company.capital && (
+                  <div className="flex items-center text-gray-600">
+                    <CreditCard className="h-4 w-4 mr-1" />
+                    <span>${Number(company.capital).toLocaleString()}</span>
+                  </div>
+                )}
+              </div>
+
+              {/* Location */}
+              {(company.city || company.region) && (
+                <div className="flex items-center text-sm text-gray-600">
+                  <MapPin className="h-4 w-4 mr-2" />
+                  {company.city && <span>{company.city}</span>}
+                  {company.city && company.region && <span className="mx-1">•</span>}
+                  {company.region && <span>{company.region}</span>}
                 </div>
               )}
-              {company.website && (
-                <div className="flex items-center text-sm text-gray-500">
-                  <Globe className="h-4 w-4 mr-2" />
+
+              {/* Registration Info */}
+              <div className="flex items-center justify-between text-sm text-gray-500">
+                <div className="flex space-x-4">
+                  {company.rc && (
+                    <span className="font-mono">RC: {company.rc}</span>
+                  )}
+                  {company.ice && (
+                    <span className="font-mono">ICE: {company.ice}</span>
+                  )}
+                </div>
+                {company.incorporation_date && (
+                  <div className="flex items-center">
+                    <Calendar className="h-4 w-4 mr-1" />
+                    <span>{new Date(company.incorporation_date).getFullYear()}</span>
+                  </div>
+                )}
+              </div>
+
+              {/* Contact Info */}
+              <div className="flex items-center justify-between">
+                {company.phone_number && (
+                  <div className="flex items-center text-sm text-gray-600">
+                    <Phone className="h-4 w-4 mr-2" />
+                    <span>{company.phone_number}</span>
+                  </div>
+                )}
+                {company.website && (
                   <a 
                     href={company.website} 
                     target="_blank" 
                     rel="noopener noreferrer"
-                    className="text-primary-600 hover:text-primary-700 truncate"
+                    className="flex items-center text-sm text-primary-600 hover:text-primary-700"
                   >
-                    {company.website}
+                    <Globe className="h-4 w-4 mr-1" />
+                    Website
                   </a>
-                </div>
-              )}
-              {company.legal_form && (
-                <div className="flex items-center text-sm text-gray-500">
-                  <MapPin className="h-4 w-4 mr-2" />
-                  {company.legal_form} • {company.capital || 'Capital not specified'}
-                </div>
-              )}
+                )}
+              </div>
             </div>
           </div>
         </div>

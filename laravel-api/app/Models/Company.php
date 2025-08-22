@@ -16,10 +16,18 @@ class Company extends Model
         'website',
         'phone_number',
         'capital',
-        'rc',
+        'rc', // Registre de Commerce (Moroccan business registration)
         'legal_form',
         'owner_id',
         'status',
+        'city', // Moroccan city
+        'region', // Moroccan region
+        'ice', // Identifiant Commun de l'Entreprise (Moroccan tax ID)
+        'cnss', // Caisse Nationale de Sécurité Sociale number
+        'patent_number', // Patente (Moroccan business license)
+        'activity_sector', // Sector of activity in Morocco
+        'incorporation_date',
+        'is_verified',
     ];
 
     // Relationships
@@ -47,6 +55,44 @@ class Company extends Model
     public function isOwnedBy(User $user)
     {
         return $this->owner_id === $user->id;
+    }
+
+    public function getFormattedCapitalAttribute()
+    {
+        return number_format($this->capital, 2) . ' MAD';
+    }
+
+    public function getMoroccanLegalFormsAttribute()
+    {
+        return [
+            'SA' => 'Société Anonyme',
+            'SARL' => 'Société à Responsabilité Limitée',
+            'SARL_AU' => 'SARL à Associé Unique',
+            'SNC' => 'Société en Nom Collectif',
+            'SCS' => 'Société en Commandite Simple',
+            'SCA' => 'Société en Commandite par Actions',
+            'EP' => 'Établissement Public',
+            'GIE' => 'Groupement d\'Intérêt Économique',
+            'EI' => 'Entreprise Individuelle',
+        ];
+    }
+
+    public function getMoroccanRegionsAttribute()
+    {
+        return [
+            'Tanger-Tétouan-Al Hoceïma',
+            'L\'Oriental',
+            'Fès-Meknès',
+            'Rabat-Salé-Kénitra',
+            'Béni Mellal-Khénifra',
+            'Casablanca-Settat',
+            'Marrakech-Safi',
+            'Drâa-Tafilalet',
+            'Souss-Massa',
+            'Guelmim-Oued Noun',
+            'Laâyoune-Sakia El Hamra',
+            'Dakhla-Oued Ed-Dahab',
+        ];
     }
 
     public function getAverageRatingAttribute()

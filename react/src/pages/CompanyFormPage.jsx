@@ -12,6 +12,41 @@ import {
   X
 } from 'lucide-react'
 
+// Legal forms
+const LEGAL_FORMS = [
+  { value: 'LLC', label: 'Limited Liability Company (LLC)' },
+  { value: 'Corporation', label: 'Corporation' },
+  { value: 'Partnership', label: 'Partnership' },
+  { value: 'Sole_Proprietorship', label: 'Sole Proprietorship' },
+  { value: 'LLP', label: 'Limited Liability Partnership' },
+  { value: 'Cooperative', label: 'Cooperative' },
+  { value: 'Trust', label: 'Trust' },
+  { value: 'Foundation', label: 'Foundation' },
+  { value: 'Other', label: 'Other' }
+]
+
+// Common business sectors
+const BUSINESS_SECTORS = [
+  'Agriculture & Food',
+  'Manufacturing',
+  'Technology',
+  'Finance & Banking',
+  'Healthcare',
+  'Education',
+  'Real Estate',
+  'Transportation',
+  'Retail & Commerce',
+  'Energy & Utilities',
+  'Telecommunications',
+  'Tourism & Hospitality',
+  'Construction',
+  'Professional Services',
+  'Media & Entertainment',
+  'Non-Profit',
+  'Government',
+  'Other'
+]
+
 const CompanyFormPage = () => {
   const navigate = useNavigate()
   const { id } = useParams()
@@ -45,7 +80,14 @@ const CompanyFormPage = () => {
     phone_number: '',
     capital: '',
     rc: '',
-    legal_form: ''
+    legal_form: 'LLC',
+    city: '',
+    region: '',
+    ice: '',
+    cnss: '',
+    patent_number: '',
+    activity_sector: '',
+    incorporation_date: ''
   })
 
   const [errors, setErrors] = useState({})
@@ -69,7 +111,14 @@ const CompanyFormPage = () => {
         phone_number: company.phone_number || '',
         capital: company.capital || '',
         rc: company.rc || '',
-        legal_form: company.legal_form || ''
+        legal_form: company.legal_form || 'LLC',
+        city: company.city || '',
+        region: company.region || '',
+        ice: company.ice || '',
+        cnss: company.cnss || '',
+        patent_number: company.patent_number || '',
+        activity_sector: company.activity_sector || '',
+        incorporation_date: company.incorporation_date || ''
       })
     }
   }, [isEditing, companyData])
@@ -117,8 +166,20 @@ const CompanyFormPage = () => {
       newErrors.name = 'Company name is required'
     }
 
+    if (!formData.legal_form) {
+      newErrors.legal_form = 'Legal form is required'
+    }
+
     if (formData.website && !isValidUrl(formData.website)) {
       newErrors.website = 'Please enter a valid website URL'
+    }
+
+    if (formData.ice && !isValidTaxId(formData.ice)) {
+      newErrors.ice = 'Please enter a valid tax ID number'
+    }
+
+    if (formData.phone_number && !isValidPhone(formData.phone_number)) {
+      newErrors.phone_number = 'Please enter a valid phone number'
     }
 
     setErrors(newErrors)
@@ -132,6 +193,15 @@ const CompanyFormPage = () => {
     } catch (_) {
       return false
     }
+  }
+
+  const isValidTaxId = (taxId) => {
+    return /^\d{9,15}$/.test(taxId)
+  }
+
+  const isValidPhone = (phone) => {
+    // General phone number pattern
+    return /^[\+]?[\d\s\-\(\)]{10,15}$/.test(phone.replace(/[\s-]/g, ''))
   }
 
   const handleSubmit = (e) => {
@@ -275,63 +345,197 @@ const CompanyFormPage = () => {
                 name="phone_number"
                 value={formData.phone_number}
                 onChange={handleChange}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none transition-colors"
-                placeholder="+1-555-0123"
+                className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none transition-colors ${errors.phone_number ? 'border-red-300' : 'border-gray-300'
+                  }`}
+                placeholder="+1-555-123-4567"
               />
+              {errors.phone_number && (
+                <p className="mt-1 text-sm text-red-600">{errors.phone_number}</p>
+              )}
             </div>
 
             {/* Capital and Legal Form Row */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
                 <label htmlFor="capital" className="block text-sm font-medium text-gray-700 mb-2">
-                  Capital
+                  Capital ($)
                 </label>
                 <input
-                  type="text"
+                  type="number"
                   id="capital"
                   name="capital"
                   value={formData.capital}
                   onChange={handleChange}
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none transition-colors"
-                  placeholder="1,000,000 USD"
+                  placeholder="100000"
+                  min="0"
+                  step="0.01"
                 />
               </div>
 
               <div>
                 <label htmlFor="legal_form" className="block text-sm font-medium text-gray-700 mb-2">
-                  Legal Form
+                  Legal Form *
                 </label>
                 <select
                   id="legal_form"
                   name="legal_form"
                   value={formData.legal_form}
                   onChange={handleChange}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none transition-colors"
+                  className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none transition-colors ${errors.legal_form ? 'border-red-300' : 'border-gray-300'
+                    }`}
+                  required
                 >
-                  <option value="">Select legal form</option>
-                  <option value="LLC">LLC</option>
-                  <option value="Corporation">Corporation</option>
-                  <option value="Partnership">Partnership</option>
-                  <option value="Sole Proprietorship">Sole Proprietorship</option>
-                  <option value="Other">Other</option>
+                  {LEGAL_FORMS.map(form => (
+                    <option key={form.value} value={form.value}>
+                      {form.label}
+                    </option>
+                  ))}
                 </select>
+                {errors.legal_form && (
+                  <p className="mt-1 text-sm text-red-600">{errors.legal_form}</p>
+                )}
               </div>
             </div>
 
-            {/* RC Number */}
-            <div>
-              <label htmlFor="rc" className="block text-sm font-medium text-gray-700 mb-2">
-                Registration Number (RC)
-              </label>
-              <input
-                type="text"
-                id="rc"
-                name="rc"
-                value={formData.rc}
-                onChange={handleChange}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none transition-colors"
-                placeholder="RC-COMPANY-001"
-              />
+            {/* Location Row */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <label htmlFor="city" className="block text-sm font-medium text-gray-700 mb-2">
+                  City
+                </label>
+                <input
+                  type="text"
+                  id="city"
+                  name="city"
+                  value={formData.city}
+                  onChange={handleChange}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none transition-colors"
+                  placeholder="New York"
+                />
+              </div>
+
+              <div>
+                <label htmlFor="region" className="block text-sm font-medium text-gray-700 mb-2">
+                  State/Region
+                </label>
+                <input
+                  type="text"
+                  id="region"
+                  name="region"
+                  value={formData.region}
+                  onChange={handleChange}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none transition-colors"
+                  placeholder="New York"
+                />
+              </div>
+            </div>
+
+            {/* Business Registration Row */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <label htmlFor="rc" className="block text-sm font-medium text-gray-700 mb-2">
+                  Registration Number
+                </label>
+                <input
+                  type="text"
+                  id="rc"
+                  name="rc"
+                  value={formData.rc}
+                  onChange={handleChange}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none transition-colors"
+                  placeholder="REG123456"
+                />
+              </div>
+
+              <div>
+                <label htmlFor="ice" className="block text-sm font-medium text-gray-700 mb-2">
+                  Tax ID Number
+                </label>
+                <input
+                  type="text"
+                  id="ice"
+                  name="ice"
+                  value={formData.ice}
+                  onChange={handleChange}
+                  className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none transition-colors ${errors.ice ? 'border-red-300' : 'border-gray-300'
+                    }`}
+                  placeholder="123456789"
+                />
+                {errors.ice && (
+                  <p className="mt-1 text-sm text-red-600">{errors.ice}</p>
+                )}
+              </div>
+            </div>
+
+            {/* Additional Registration Info */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <label htmlFor="cnss" className="block text-sm font-medium text-gray-700 mb-2">
+                  Social Security Number
+                </label>
+                <input
+                  type="text"
+                  id="cnss"
+                  name="cnss"
+                  value={formData.cnss}
+                  onChange={handleChange}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none transition-colors"
+                  placeholder="123456789"
+                />
+              </div>
+
+              <div>
+                <label htmlFor="patent_number" className="block text-sm font-medium text-gray-700 mb-2">
+                  License Number
+                </label>
+                <input
+                  type="text"
+                  id="patent_number"
+                  name="patent_number"
+                  value={formData.patent_number}
+                  onChange={handleChange}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none transition-colors"
+                  placeholder="LIC123456"
+                />
+              </div>
+            </div>
+
+            {/* Business Sector and Incorporation Date */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <label htmlFor="activity_sector" className="block text-sm font-medium text-gray-700 mb-2">
+                  Business Sector
+                </label>
+                <select
+                  id="activity_sector"
+                  name="activity_sector"
+                  value={formData.activity_sector}
+                  onChange={handleChange}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none transition-colors"
+                >
+                  <option value="">Select a sector</option>
+                  {BUSINESS_SECTORS.map(sector => (
+                    <option key={sector} value={sector}>
+                      {sector}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label htmlFor="incorporation_date" className="block text-sm font-medium text-gray-700 mb-2">
+                  Incorporation Date
+                </label>
+                <input
+                  type="date"
+                  id="incorporation_date"
+                  name="incorporation_date"
+                  value={formData.incorporation_date}
+                  onChange={handleChange}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none transition-colors"
+                />
+              </div>
             </div>
 
             {/* Form Actions */}

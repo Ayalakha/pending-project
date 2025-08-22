@@ -14,7 +14,7 @@ class CompanyController extends Controller
     public function index(Request $request)
     {
         $query = Company::with(['owner', 'servicesOrProducts', 'approvedReviews'])
-            ->where('status', 'approved') // Only show approved companies
+            ->where('status', 'active') // Only show active companies
             ->withCount('approvedReviews as total_reviews')
             ->withAvg('approvedReviews as average_rating', 'rating')
             ->orderBy('created_at', 'desc');
@@ -87,8 +87,8 @@ class CompanyController extends Controller
      */
     public function show(Company $company)
     {
-        // Only allow viewing approved companies for public access
-        if ($company->status !== 'approved') {
+        // Only allow viewing active companies for public access
+        if ($company->status !== 'active') {
             return response()->json([
                 'status' => 'error',
                 'message' => 'Company not found or not available'
