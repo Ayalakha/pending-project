@@ -223,6 +223,13 @@ class RealMoroccanCompaniesSeeder extends Seeder
         ];
 
         foreach ($companies as $companyData) {
+            // Convert foreign legal forms to Moroccan equivalents
+            if ($companyData['legal_form'] === 'Corporation') {
+                $companyData['legal_form'] = 'SA'; // Société Anonyme
+            } elseif ($companyData['legal_form'] === 'LLC') {
+                $companyData['legal_form'] = 'SARL'; // SARL
+            }
+            
             Company::create($companyData);
         }
 
