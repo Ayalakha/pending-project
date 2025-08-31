@@ -337,7 +337,7 @@ const CompaniesPage = () => {
 
             {/* Minimal Search Bar */}
             <form onSubmit={handleSearch} className="max-w-2xl mx-auto">
-              <div className="relative">
+              <div className="relative ">
                 <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
                 <input
                   type="text"
@@ -350,9 +350,9 @@ const CompaniesPage = () => {
                   <button
                     type="button"
                     onClick={clearSearch}
-                    className="absolute right-16 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors duration-200"
+                    className="absolute  mr-8 right-16 top-1/2 transform -translate-y-1/2 text-gray-400 bg-white hover:text-gray-600 transition-colors duration-200"
                   >
-                    <X className="h-5 w-5" />
+                    <X className="h-5 w-5 " />
                   </button>
                 )}
                 <button
@@ -368,7 +368,7 @@ const CompaniesPage = () => {
               <div className="mt-6">
                 <button
                   onClick={clearSearch}
-                  className="inline-flex items-center px-3 py-1 text-sm text-gray-600 hover:text-gray-900 transition-colors duration-200"
+                  className="inline-flex items-center px-3 py-1 text-sm bg-red-200 text-gray-600 hover:text-gray-900 transition-colors duration-200"
                 >
                   <X className="h-4 w-4 mr-1" />
                   Clear search
