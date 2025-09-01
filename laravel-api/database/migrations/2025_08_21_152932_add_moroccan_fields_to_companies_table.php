@@ -12,11 +12,25 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('companies', function (Blueprint $table) {
-            // Drop indexes first
-            $table->dropIndex(['external_source', 'external_id']);
-            
-            // Remove external/global fields since we're focusing only on Moroccan companies
-            $table->dropColumn(['external_id', 'external_source', 'external_data', 'jurisdiction', 'company_type', 'registered_address']);
+            // Check if columns exist before trying to drop them
+            if (Schema::hasColumn('companies', 'external_id')) {
+                $table->dropColumn('external_id');
+            }
+            if (Schema::hasColumn('companies', 'external_source')) {
+                $table->dropColumn('external_source');
+            }
+            if (Schema::hasColumn('companies', 'external_data')) {
+                $table->dropColumn('external_data');
+            }
+            if (Schema::hasColumn('companies', 'jurisdiction')) {
+                $table->dropColumn('jurisdiction');
+            }
+            if (Schema::hasColumn('companies', 'company_type')) {
+                $table->dropColumn('company_type');
+            }
+            if (Schema::hasColumn('companies', 'registered_address')) {
+                $table->dropColumn('registered_address');
+            }
         });
     }
 

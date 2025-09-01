@@ -12,23 +12,39 @@ import {
   X
 } from 'lucide-react'
 
-// Legal forms
+// Legal forms (Moroccan legal forms)
 const LEGAL_FORMS = [
-  { value: 'LLC', label: 'Limited Liability Company (LLC)' },
-  { value: 'Corporation', label: 'Corporation' },
-  { value: 'Partnership', label: 'Partnership' },
-  { value: 'Sole_Proprietorship', label: 'Sole Proprietorship' },
-  { value: 'LLP', label: 'Limited Liability Partnership' },
-  { value: 'Cooperative', label: 'Cooperative' },
-  { value: 'Trust', label: 'Trust' },
-  { value: 'Foundation', label: 'Foundation' },
-  { value: 'Other', label: 'Other' }
+  { value: 'SARL', label: 'SARL (Société à Responsabilité Limitée)' },
+  { value: 'SA', label: 'SA (Société Anonyme)' },
+  { value: 'SARL_AU', label: 'SARL AU (SARL à Associé Unique)' },
+  { value: 'SNC', label: 'SNC (Société en Nom Collectif)' },
+  { value: 'SCS', label: 'SCS (Société en Commandite Simple)' },
+  { value: 'SCA', label: 'SCA (Société en Commandite par Actions)' },
+  { value: 'EP', label: 'EP (Entreprise Publique)' },
+  { value: 'GIE', label: 'GIE (Groupement d\'Intérêt Économique)' },
+  { value: 'EI', label: 'EI (Entreprise Individuelle)' }
+]
+
+// Moroccan regions
+const MOROCCAN_REGIONS = [
+  'Tanger-Tétouan-Al Hoceïma',
+  'Oriental', 
+  'Fès-Meknès',
+  'Rabat-Salé-Kénitra',
+  'Béni Mellal-Khénifra',
+  'Casablanca-Settat',
+  'Marrakech-Safi',
+  'Drâa-Tafilalet',
+  'Souss-Massa',
+  'Guelmim-Oued Noun',
+  'Laâyoune-Sakia El Hamra',
+  'Dakhla-Oued Ed-Dahab'
 ]
 
 // Common business sectors
 const BUSINESS_SECTORS = [
   'Agriculture & Food',
-  'Manufacturing',
+  'Manufacturing', 
   'Technology',
   'Finance & Banking',
   'Healthcare',
@@ -80,7 +96,7 @@ const CompanyFormPage = () => {
     phone_number: '',
     capital: '',
     rc: '',
-    legal_form: 'LLC',
+    legal_form: 'SARL',
     city: '',
     region: '',
     ice: '',
@@ -93,10 +109,11 @@ const CompanyFormPage = () => {
   const [errors, setErrors] = useState({})
 
   // Fetch company data for editing
-  const { data: companyData, isLoading: isLoadingCompany } = useQuery({
+  const { data: companyData, isLoading: isLoadingCompany, error: companyError } = useQuery({
     queryKey: ['company', id],
     queryFn: () => companyService.getCompany(id),
     enabled: isEditing,
+    retry: false // Don't retry on 404
   })
 
   // Populate form when editing
@@ -111,7 +128,7 @@ const CompanyFormPage = () => {
         phone_number: company.phone_number || '',
         capital: company.capital || '',
         rc: company.rc || '',
-        legal_form: company.legal_form || 'LLC',
+        legal_form: company.legal_form || 'SARL',
         city: company.city || '',
         region: company.region || '',
         ice: company.ice || '',
@@ -223,6 +240,29 @@ const CompanyFormPage = () => {
           <div className="flex items-center justify-center py-12">
             <Loader2 className="h-8 w-8 animate-spin text-primary-600" />
             <span className="ml-2 text-gray-600">Loading company details...</span>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  // Handle company not found error (404)
+  if (isEditing && companyError) {
+    return (
+      <div className="min-h-screen bg-gray-50 py-8">
+        <div className="container mx-auto px-4">
+          <div className="bg-red-50 border border-red-200 rounded-lg p-6 text-center max-w-md mx-auto">
+            <AlertCircle className="h-12 w-12 text-red-600 mx-auto mb-4" />
+            <h2 className="text-lg font-medium text-red-800 mb-2">Company Not Found</h2>
+            <p className="text-red-600 mb-4">
+              The company you're trying to edit doesn't exist or has been deleted.
+            </p>
+            <button
+              onClick={() => navigate('/my-companies')}
+              className="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors"
+            >
+              Back to My Companies
+            </button>
           </div>
         </div>
       </div>
@@ -417,17 +457,22 @@ const CompanyFormPage = () => {
 
               <div>
                 <label htmlFor="region" className="block text-sm font-medium text-gray-700 mb-2">
-                  State/Region
+                  Region (Morocco)
                 </label>
-                <input
-                  type="text"
+                <select
                   id="region"
                   name="region"
                   value={formData.region}
                   onChange={handleChange}
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none transition-colors"
-                  placeholder="New York"
-                />
+                >
+                  <option value="">Select a region</option>
+                  {MOROCCAN_REGIONS.map(region => (
+                    <option key={region} value={region}>
+                      {region}
+                    </option>
+                  ))}
+                </select>
               </div>
             </div>
 
