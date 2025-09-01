@@ -9,7 +9,8 @@ const ProfilePage = () => {
   const { user, isAuthenticated, updateProfile: updateUserContext } = useAuth()
   
   console.log('ProfilePage rendering with user:', user)
-  console.log('ProfilePage user username:', user?.username)
+  console.log('ProfilePage user first_name:', user?.first_name)
+  console.log('ProfilePage user last_name:', user?.last_name)
   
   const [isEditingProfile, setIsEditingProfile] = useState(false)
   const [isChangingPassword, setIsChangingPassword] = useState(false)
@@ -396,22 +397,6 @@ const ProfilePage = () => {
                   )}
                 </div>
 
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Last Name
-                  </label>
-                  <input
-                    type="text"
-                    name="last_name"
-                    value={profileForm.last_name}
-                    onChange={handleProfileChange}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
-                  />
-                  {errors.last_name && (
-                    <p className="text-red-600 text-sm mt-1">{errors.last_name[0]}</p>
-                  )}
-                </div>
-
                 <div className="md:col-span-2">
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Phone Number
@@ -462,10 +447,9 @@ const ProfilePage = () => {
                     setErrors({})
                     // Reset form to current user data
                     setProfileForm({
-                      username: user?.username || '',
-                      email: user?.email || '',
                       first_name: user?.first_name || '',
                       last_name: user?.last_name || '',
+                      email: user?.email || '',
                       phone: user?.phone || '',
                       bio: user?.bio || ''
                     })

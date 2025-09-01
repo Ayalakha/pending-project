@@ -25,13 +25,19 @@ const UserActionModal = ({ isOpen, onClose, user, onRoleChange, onDelete, isUpda
   if (!isOpen) return null
 
   const handleRoleChange = (newRole) => {
-    if (window.confirm(`Change ${user.username}'s role to ${newRole}?`)) {
+    const displayName = user.first_name || user.last_name 
+      ? `${user.first_name || ''} ${user.last_name || ''}`.trim()
+      : user.email
+    if (window.confirm(`Change ${displayName}'s role to ${newRole}?`)) {
       onRoleChange(newRole)
     }
   }
 
   const handleDelete = () => {
-    if (window.confirm(`Are you sure you want to delete user "${user.username}"? This action cannot be undone.`)) {
+    const displayName = user.first_name || user.last_name 
+      ? `${user.first_name || ''} ${user.last_name || ''}`.trim()
+      : user.email
+    if (window.confirm(`Are you sure you want to delete user "${displayName}"? This action cannot be undone.`)) {
       onDelete()
     }
   }
@@ -61,7 +67,12 @@ const UserActionModal = ({ isOpen, onClose, user, onRoleChange, onDelete, isUpda
               <Users className="h-5 w-5 text-blue-600" />
             </div>
             <div className="ml-3">
-              <div className="text-sm font-medium text-gray-900">{user.username}</div>
+              <div className="text-sm font-medium text-gray-900">
+                {user.first_name || user.last_name 
+                  ? `${user.first_name || ''} ${user.last_name || ''}`.trim()
+                  : user.email
+                }
+              </div>
               <div className="text-sm text-gray-500">{user.email}</div>
             </div>
           </div>
@@ -172,7 +183,12 @@ const UserRow = ({ user, onUpdate }) => {
               <Users className="h-5 w-5 text-blue-600" />
             </div>
             <div className="ml-4">
-              <div className="text-sm font-medium text-gray-900">{user.username}</div>
+              <div className="text-sm font-medium text-gray-900">
+                {user.first_name || user.last_name 
+                  ? `${user.first_name || ''} ${user.last_name || ''}`.trim()
+                  : user.email
+                }
+              </div>
               <div className="text-sm text-gray-500">{user.email}</div>
             </div>
           </div>

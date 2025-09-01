@@ -144,7 +144,12 @@ const CommentItem = ({ comment, onCommentUpdate }) => {
             <User className="h-4 w-4 text-primary-600" />
           </div>
           <div>
-            <p className="font-medium text-gray-900">{comment.user?.username || 'Anonymous'}</p>
+            <p className="font-medium text-gray-900">
+              {comment.user?.first_name || comment.user?.last_name 
+                ? `${comment.user?.first_name || ''} ${comment.user?.last_name || ''}`.trim()
+                : 'Anonymous'
+              }
+            </p>
             <p className="text-sm text-gray-500">{formatDate(comment.created_at)}</p>
           </div>
         </div>

@@ -15,6 +15,14 @@ const Header = () => {
   // Close user menu when clicking outside
   const userMenuRef = useClickOutside(() => setIsUserMenuOpen(false))
 
+  // Helper function to get user display name
+  const getUserDisplayName = () => {
+    if (user?.first_name || user?.last_name) {
+      return `${user?.first_name || ''} ${user?.last_name || ''}`.trim()
+    }
+    return user?.email?.split('@')[0] || 'User'
+  }
+
   const isActive = (path) => location.pathname === path
 
   const handleSearch = (e) => {
@@ -116,7 +124,7 @@ const Header = () => {
                       </div>
                     </div>
                     <div className="flex flex-col items-start">
-                      <span className="text-sm font-medium">{user?.username}</span>
+                      <span className="text-sm font-medium">{getUserDisplayName()}</span>
                       <span className="text-xs text-gray-500">{user?.role}</span>
                     </div>
                   </button>
@@ -125,7 +133,7 @@ const Header = () => {
                   {isUserMenuOpen && (
                     <div className="absolute right-0 mt-2 w-64 bg-white/95 backdrop-blur-md rounded-2xl shadow-xl border border-gray-200/60 py-2 z-10 overflow-hidden">
                       <div className="px-4 py-3 bg-gradient-to-r from-blue-50 to-indigo-50/80 border-b border-gray-100">
-                        <p className="text-sm font-semibold text-gray-900">{user?.username}</p>
+                        <p className="text-sm font-semibold text-gray-900">{getUserDisplayName()}</p>
                         <p className="text-sm text-gray-600">{user?.email}</p>
                         <span className="inline-block px-3 py-1 text-xs font-medium bg-blue-100 text-blue-700 rounded-full mt-2">
                           {user?.role}
