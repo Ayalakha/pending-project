@@ -152,13 +152,13 @@ const CommentItem = ({ comment, onCommentUpdate }) => {
           <div className="flex items-center space-x-2">
             <button
               onClick={() => setIsEditing(!isEditing)}
-              className="text-gray-400 hover:text-gray-600 p-1"
+              className="text-gray-400 bg-white hover:text-gray-600 p-1"
             >
               <Edit2 className="h-4 w-4" />
             </button>
             <button
               onClick={handleDelete}
-              className="text-gray-400 hover:text-red-600 p-1"
+              className="text-gray-400 bg-white hover:text-red-600 p-1"
               disabled={deleteMutation.isLoading}
             >
               <Trash2 className="h-4 w-4" />

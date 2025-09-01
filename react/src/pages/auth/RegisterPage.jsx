@@ -11,7 +11,8 @@ const RegisterPage = () => {
   const redirectPath = searchParams.get('redirect') || '/'
 
   const [formData, setFormData] = useState({
-    username: '',
+    first_name: '',
+    last_name: '',
     email: '',
     password: '',
     password_confirmation: '',
@@ -46,11 +47,18 @@ const RegisterPage = () => {
   const validateForm = () => {
     const newErrors = {}
 
-    // Name validation
-    if (!formData.username.trim()) {
-      newErrors.username = 'Username is required'
-    } else if (formData.username.length < 2) {
-      newErrors.username = 'Username must be at least 2 characters'
+    // First name validation
+    if (!formData.first_name.trim()) {
+      newErrors.first_name = 'First name is required'
+    } else if (formData.first_name.length < 2) {
+      newErrors.first_name = 'First name must be at least 2 characters'
+    }
+
+    // Last name validation
+    if (!formData.last_name.trim()) {
+      newErrors.last_name = 'Last name is required'
+    } else if (formData.last_name.length < 2) {
+      newErrors.last_name = 'Last name must be at least 2 characters'
     }
 
     // Email validation
@@ -148,30 +156,57 @@ const RegisterPage = () => {
           )}
 
           <form onSubmit={handleSubmit} className="space-y-6">
-            {/* Username Field */}
-            <div>
-              <label htmlFor="username" className="block text-sm font-semibold text-gray-700 mb-3">
-                Username
-              </label>
-              <div className="relative">
-                <User className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
-                <input
-                  id="username"
-                  name="username"
-                  type="text"
-                  autoComplete="username"
-                  required
-                  value={formData.username}
-                  onChange={handleChange}
-                  className={`w-full pl-12 pr-4 py-4 border rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all duration-300 bg-gray-50/50 hover:bg-white text-lg ${
-                    errors.username ? 'border-red-300' : 'border-gray-200'
-                  }`}
-                  placeholder="Enter your username"
-                />
+            {/* Name Fields */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label htmlFor="first_name" className="block text-sm font-semibold text-gray-700 mb-3">
+                  First Name
+                </label>
+                <div className="relative">
+                  <User className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
+                  <input
+                    id="first_name"
+                    name="first_name"
+                    type="text"
+                    autoComplete="given-name"
+                    required
+                    value={formData.first_name}
+                    onChange={handleChange}
+                    className={`w-full pl-12 pr-4 py-4 border rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all duration-300 bg-gray-50/50 hover:bg-white text-lg ${
+                      errors.first_name ? 'border-red-300' : 'border-gray-200'
+                    }`}
+                    placeholder="Enter your first name"
+                  />
+                </div>
+                {errors.first_name && (
+                  <p className="mt-2 text-sm text-red-600 font-medium">{errors.first_name}</p>
+                )}
               </div>
-              {errors.username && (
-                <p className="mt-2 text-sm text-red-600 font-medium">{errors.username}</p>
-              )}
+
+              <div>
+                <label htmlFor="last_name" className="block text-sm font-semibold text-gray-700 mb-3">
+                  Last Name
+                </label>
+                <div className="relative">
+                  <User className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
+                  <input
+                    id="last_name"
+                    name="last_name"
+                    type="text"
+                    autoComplete="family-name"
+                    required
+                    value={formData.last_name}
+                    onChange={handleChange}
+                    className={`w-full pl-12 pr-4 py-4 border rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all duration-300 bg-gray-50/50 hover:bg-white text-lg ${
+                      errors.last_name ? 'border-red-300' : 'border-gray-200'
+                    }`}
+                    placeholder="Enter your last name"
+                  />
+                </div>
+                {errors.last_name && (
+                  <p className="mt-2 text-sm text-red-600 font-medium">{errors.last_name}</p>
+                )}
+              </div>
             </div>
 
             {/* Email Field */}

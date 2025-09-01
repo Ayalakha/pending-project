@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useAuth } from '../contexts/AuthContext'
 import { authService } from '../services/authService'
 import { User, Mail, Calendar, Shield, Edit3, Lock, Phone, FileText, Save, X, Eye, EyeOff } from 'lucide-react'
@@ -7,6 +7,10 @@ import { useMutation } from '@tanstack/react-query'
 
 const ProfilePage = () => {
   const { user, isAuthenticated, updateProfile: updateUserContext } = useAuth()
+  
+  console.log('ProfilePage rendering with user:', user)
+  console.log('ProfilePage user username:', user?.username)
+  
   const [isEditingProfile, setIsEditingProfile] = useState(false)
   const [isChangingPassword, setIsChangingPassword] = useState(false)
   const [showPassword, setShowPassword] = useState({
@@ -17,10 +21,9 @@ const ProfilePage = () => {
 
   // Profile form state
   const [profileForm, setProfileForm] = useState({
-    username: user?.username || '',
-    email: user?.email || '',
     first_name: user?.first_name || '',
     last_name: user?.last_name || '',
+    email: user?.email || '',
     phone: user?.phone || '',
     bio: user?.bio || ''
   })
@@ -34,6 +37,21 @@ const ProfilePage = () => {
 
   const [errors, setErrors] = useState({})
   const [successMessage, setSuccessMessage] = useState('')
+  const [lastUpdate, setLastUpdate] = useState(Date.now())
+
+  // Sync form data with user changes
+  useEffect(() => {
+    console.log('User data changed:', user)
+    if (user) {
+      setProfileForm({
+        first_name: user.first_name || '',
+        last_name: user.last_name || '',
+        email: user.email || '',
+        phone: user.phone || '',
+        bio: user.bio || ''
+      })
+    }
+  }, [user])
 
   if (!isAuthenticated) {
     return <Navigate to="/login" replace />
@@ -76,14 +94,46 @@ const ProfilePage = () => {
   // Profile update mutation
   const updateProfileMutation = useMutation({
     mutationFn: (data) => authService.updateProfile(data),
-    onSuccess: (response) => {
+    onSuccess: async (response) => {
+      console.log('Profile update response:', response)
+      console.log('Old user data:', user)
+      console.log('New user data:', response.user)
+      
+      // Update localStorage immediately to ensure persistence
+      localStorage.setItem('user', JSON.stringify(response.user))
+      
+      // Update context
       updateUserContext(response.user)
+      
+      // Update the form state with the new user data
+      setProfileForm({
+        first_name: response.user.first_name || '',
+        last_name: response.user.last_name || '',
+        email: response.user.email || '',
+        phone: response.user.phone || '',
+        bio: response.user.bio || ''
+      })
+      
       setSuccessMessage('Profile updated successfully!')
       setIsEditingProfile(false)
       setErrors({})
+      setLastUpdate(Date.now()) // Force re-render
+      
+      // Force a re-fetch of user data to ensure consistency
+      try {
+        const freshUserData = await authService.getProfile()
+        if (freshUserData.status === 'success') {
+          console.log('Fresh user data from server:', freshUserData.user)
+          updateUserContext(freshUserData.user)
+        }
+      } catch (error) {
+        console.error('Failed to fetch fresh user data:', error)
+      }
+      
       setTimeout(() => setSuccessMessage(''), 3000)
     },
     onError: (error) => {
+      console.error('Profile update error:', error)
       setErrors(error.response?.data?.errors || { general: 'Failed to update profile' })
     }
   })
@@ -140,7 +190,117 @@ const ProfilePage = () => {
   const getFullName = () => {
     const firstName = user?.first_name || ''
     const lastName = user?.last_name || ''
-    return firstName || lastName ? `${firstName} ${lastName}`.trim() : user?.username
+    const fullName = firstName || lastName ? `${firstName} ${lastName}`.trim() : ''
+    return fullName || 'User'
+  }
+
+  // Profile Display Component
+  const ProfileDisplay = ({ userData }) => {
+    console.log('ProfileDisplay rendering with userData:', userData)
+    console.log('ProfileDisplay userData first_name:', userData?.first_name)
+    console.log('ProfileDisplay userData last_name:', userData?.last_name)
+    
+    const displayName = () => {
+      // Use first_name and last_name for display
+      const firstName = userData?.first_name || ''
+      const lastName = userData?.last_name || ''
+      const fullName = `${firstName} ${lastName}`.trim()
+      console.log('ProfileDisplay displayName calculated:', fullName)
+      return fullName || 'User'
+    }
+    
+    const getFirstName = () => userData?.first_name || ''
+    const getLastName = () => userData?.last_name || ''
+
+    return (
+      <div>
+        <div className="flex items-center space-x-6 mb-6">
+          <div className="w-20 h-20 bg-blue-100 rounded-full flex items-center justify-center">
+            <User className="h-10 w-10 text-blue-600" />
+          </div>
+          <div>
+            <h2 className="text-2xl font-semibold text-gray-900">{displayName()}</h2>
+            {getFullName() && (
+              <p className="text-lg text-gray-700">{getFullName()}</p>
+            )}
+            <p className="text-gray-600">{userData?.email}</p>
+            <span className={`inline-block px-3 py-1 text-sm font-medium rounded-full mt-2 ${getRoleBadgeColor(userData?.role)}`}>
+              {getRoleDisplayName(userData?.role)}
+            </span>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="space-y-4">
+            <div className="flex items-center space-x-3">
+              <User className="h-5 w-5 text-gray-400" />
+              <div>
+                <p className="text-sm font-medium text-gray-600">First Name</p>
+                <p className="text-gray-900">{getFirstName()}</p>
+              </div>
+            </div>
+            
+            <div className="flex items-center space-x-3">
+              <User className="h-5 w-5 text-gray-400" />
+              <div>
+                <p className="text-sm font-medium text-gray-600">Last Name</p>
+                <p className="text-gray-900">{getLastName()}</p>
+              </div>
+            </div>
+
+            <div className="flex items-center space-x-3">
+              <Mail className="h-5 w-5 text-gray-400" />
+              <div>
+                <p className="text-sm font-medium text-gray-600">Email Address</p>
+                <p className="text-gray-900">{userData?.email}</p>
+              </div>
+            </div>
+
+            {userData?.phone && (
+              <div className="flex items-center space-x-3">
+                <Phone className="h-5 w-5 text-gray-400" />
+                <div>
+                  <p className="text-sm font-medium text-gray-600">Phone Number</p>
+                  <p className="text-gray-900">{userData.phone}</p>
+                </div>
+              </div>
+            )}
+          </div>
+
+          <div className="space-y-4">
+            <div className="flex items-center space-x-3">
+              <Shield className="h-5 w-5 text-gray-400" />
+              <div>
+                <p className="text-sm font-medium text-gray-600">Account Type</p>
+                <p className="text-gray-900">{getRoleDisplayName(userData?.role)}</p>
+              </div>
+            </div>
+
+            <div className="flex items-center space-x-3">
+              <Calendar className="h-5 w-5 text-gray-400" />
+              <div>
+                <p className="text-sm font-medium text-gray-600">Member Since</p>
+                <p className="text-gray-900">
+                  {userData?.created_at ? formatDate(userData.created_at) : 'Unknown'}
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {userData?.bio && (
+            <div className="md:col-span-2">
+              <div className="flex items-start space-x-3">
+                <FileText className="h-5 w-5 text-gray-400 mt-1" />
+                <div>
+                  <p className="text-sm font-medium text-gray-600">Bio</p>
+                  <p className="text-gray-900 mt-1">{userData.bio}</p>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+    )
   }
 
   return (
@@ -187,18 +347,35 @@ const ProfilePage = () => {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Username *
+                    First Name *
                   </label>
                   <input
                     type="text"
-                    name="username"
-                    value={profileForm.username}
+                    name="first_name"
+                    value={profileForm.first_name}
                     onChange={handleProfileChange}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
                     required
                   />
-                  {errors.username && (
-                    <p className="text-red-600 text-sm mt-1">{errors.username[0]}</p>
+                  {errors.first_name && (
+                    <p className="text-red-600 text-sm mt-1">{errors.first_name[0]}</p>
+                  )}
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Last Name *
+                  </label>
+                  <input
+                    type="text"
+                    name="last_name"
+                    value={profileForm.last_name}
+                    onChange={handleProfileChange}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                    required
+                  />
+                  {errors.last_name && (
+                    <p className="text-red-600 text-sm mt-1">{errors.last_name[0]}</p>
                   )}
                 </div>
 
@@ -216,22 +393,6 @@ const ProfilePage = () => {
                   />
                   {errors.email && (
                     <p className="text-red-600 text-sm mt-1">{errors.email[0]}</p>
-                  )}
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    First Name
-                  </label>
-                  <input
-                    type="text"
-                    name="first_name"
-                    value={profileForm.first_name}
-                    onChange={handleProfileChange}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
-                  />
-                  {errors.first_name && (
-                    <p className="text-red-600 text-sm mt-1">{errors.first_name[0]}</p>
                   )}
                 </div>
 
@@ -299,6 +460,7 @@ const ProfilePage = () => {
                   onClick={() => {
                     setIsEditingProfile(false)
                     setErrors({})
+                    // Reset form to current user data
                     setProfileForm({
                       username: user?.username || '',
                       email: user?.email || '',
@@ -317,82 +479,7 @@ const ProfilePage = () => {
             </form>
           ) : (
             /* Display Profile Information */
-            <div>
-              <div className="flex items-center space-x-6 mb-6">
-                <div className="w-20 h-20 bg-blue-100 rounded-full flex items-center justify-center">
-                  <User className="h-10 w-10 text-blue-600" />
-                </div>
-                <div>
-                  <h2 className="text-2xl font-semibold text-gray-900">{getFullName()}</h2>
-                  <p className="text-gray-600">{user?.email}</p>
-                  <span className={`inline-block px-3 py-1 text-sm font-medium rounded-full mt-2 ${getRoleBadgeColor(user?.role)}`}>
-                    {getRoleDisplayName(user?.role)}
-                  </span>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="space-y-4">
-                  <div className="flex items-center space-x-3">
-                    <User className="h-5 w-5 text-gray-400" />
-                    <div>
-                      <p className="text-sm font-medium text-gray-600">Full Name</p>
-                      <p className="text-gray-900">{getFullName()}</p>
-                    </div>
-                  </div>
-
-                  <div className="flex items-center space-x-3">
-                    <Mail className="h-5 w-5 text-gray-400" />
-                    <div>
-                      <p className="text-sm font-medium text-gray-600">Email Address</p>
-                      <p className="text-gray-900">{user?.email}</p>
-                    </div>
-                  </div>
-
-                  {user?.phone && (
-                    <div className="flex items-center space-x-3">
-                      <Phone className="h-5 w-5 text-gray-400" />
-                      <div>
-                        <p className="text-sm font-medium text-gray-600">Phone Number</p>
-                        <p className="text-gray-900">{user.phone}</p>
-                      </div>
-                    </div>
-                  )}
-                </div>
-
-                <div className="space-y-4">
-                  <div className="flex items-center space-x-3">
-                    <Shield className="h-5 w-5 text-gray-400" />
-                    <div>
-                      <p className="text-sm font-medium text-gray-600">Account Type</p>
-                      <p className="text-gray-900">{getRoleDisplayName(user?.role)}</p>
-                    </div>
-                  </div>
-
-                  <div className="flex items-center space-x-3">
-                    <Calendar className="h-5 w-5 text-gray-400" />
-                    <div>
-                      <p className="text-sm font-medium text-gray-600">Member Since</p>
-                      <p className="text-gray-900">
-                        {user?.created_at ? formatDate(user.created_at) : 'Unknown'}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-
-                {user?.bio && (
-                  <div className="md:col-span-2">
-                    <div className="flex items-start space-x-3">
-                      <FileText className="h-5 w-5 text-gray-400 mt-1" />
-                      <div>
-                        <p className="text-sm font-medium text-gray-600">Bio</p>
-                        <p className="text-gray-900 mt-1">{user.bio}</p>
-                      </div>
-                    </div>
-                  </div>
-                )}
-              </div>
-            </div>
+            <ProfileDisplay userData={user} key={`profile-${user?.id}-${user?.first_name}-${user?.last_name}-${lastUpdate}`} />
           )}
         </div>
 
