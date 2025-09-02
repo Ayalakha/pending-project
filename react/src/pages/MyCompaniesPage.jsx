@@ -11,7 +11,6 @@ import {
   MapPin,
   Loader2,
   AlertCircle,
-  CheckCircle,
   Calendar,
   CreditCard
 } from 'lucide-react'
@@ -57,9 +56,34 @@ const CompanyCard = ({ company, onDelete }) => {
               <h3 className="text-lg font-semibold text-gray-900">
                 {company.name}
               </h3>
-              {company.is_verified && (
-                <CheckCircle className="h-5 w-5 text-green-600 ml-2" title="Verified Company" />
-              )}
+              
+              {/* Status Badge */}
+              <div className="ml-3">
+                {company.status === 'active' && (
+                  <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                    <div className="w-1.5 h-1.5 bg-green-400 rounded-full mr-1.5"></div>
+                    Active
+                  </span>
+                )}
+                {company.status === 'pending' && (
+                  <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+                    <div className="w-1.5 h-1.5 bg-yellow-400 rounded-full mr-1.5"></div>
+                    Pending Review
+                  </span>
+                )}
+                {company.status === 'inactive' && (
+                  <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                    <div className="w-1.5 h-1.5 bg-red-400 rounded-full mr-1.5"></div>
+                    Inactive
+                  </span>
+                )}
+                {(!company.status || !['active', 'pending', 'inactive'].includes(company.status)) && (
+                  <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                    <div className="w-1.5 h-1.5 bg-gray-400 rounded-full mr-1.5"></div>
+                    Unknown Status
+                  </span>
+                )}
+              </div>
             </div>
             <p className="text-gray-600 text-sm mb-3 line-clamp-2">
               {company.description || 'No description provided'}
@@ -158,13 +182,13 @@ const CompanyCard = ({ company, onDelete }) => {
           <button
             onClick={handleDelete}
             disabled={isDeleting}
-            className="text-red-600 hover:text-red-700 p-2 rounded-lg hover:bg-red-50 transition-colors disabled:opacity-50"
+            className="text-red-600 hover:text-red-700 p-2 rounded-lg bg-white hover:bg-red-50 transition-colors disabled:opacity-50"
             title="Delete Company"
           >
             {isDeleting ? (
               <Loader2 className="h-4 w-4 animate-spin" />
             ) : (
-              <Trash2 className="h-4 w-4" />
+              <Trash2 className="h-4 w-4 " />
             )}
           </button>
         </div>
