@@ -227,8 +227,18 @@ const CompanyFormPage = () => {
     if (validateForm()) {
       // Clean up data before sending
       const cleanData = Object.fromEntries(
-        Object.entries(formData).map(([key, value]) => [key, value.trim()])
+        Object.entries(formData).map(([key, value]) => {
+          // Convert all values to strings, but handle special cases
+          if (key === 'capital' && value !== '' && value !== null && value !== undefined) {
+            return [key, String(value)]
+          }
+          return [
+            key, 
+            typeof value === 'string' ? value.trim() : value
+          ]
+        })
       )
+      
       mutation.mutate(cleanData)
     }
   }

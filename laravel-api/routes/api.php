@@ -244,7 +244,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
         }
         
         $company = \App\Models\Company::findOrFail($companyId);
-        $company->status = 'approved';
+        $company->status = 'active';
         $company->save();
         
         return response()->json(['message' => 'Company approved successfully']);
@@ -257,7 +257,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
         }
         
         $company = \App\Models\Company::findOrFail($companyId);
-        $company->status = 'rejected';
+        $company->status = 'inactive';
         $company->save();
         
         return response()->json(['message' => 'Company rejected successfully']);
@@ -308,9 +308,9 @@ Route::middleware(['auth:sanctum'])->group(function () {
             // Mock company analytics
             return response()->json([
                 'totalCompanies' => \App\Models\Company::count(),
-                'approvedCompanies' => \App\Models\Company::where('status', 'approved')->count(),
+                'approvedCompanies' => \App\Models\Company::where('status', 'active')->count(),
                 'pendingCompanies' => \App\Models\Company::where('status', 'pending')->count(),
-                'rejectedCompanies' => \App\Models\Company::where('status', 'rejected')->count(),
+                'rejectedCompanies' => \App\Models\Company::where('status', 'inactive')->count(),
                 'companiesGrowth' => 8.2,
                 'averageViews' => 1250,
                 'topCategories' => [

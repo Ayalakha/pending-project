@@ -50,6 +50,13 @@ class CompanyController extends Controller
             'capital' => 'nullable|string|max:100',
             'rc' => 'nullable|string|max:100',
             'legal_form' => 'nullable|string|max:100',
+            'city' => 'nullable|string|max:255',
+            'region' => 'nullable|string|max:255',
+            'ice' => 'nullable|string|max:50',
+            'cnss' => 'nullable|string|max:50',
+            'patent_number' => 'nullable|string|max:100',
+            'activity_sector' => 'nullable|string|max:255',
+            'incorporation_date' => 'nullable|date',
         ]);
 
         if ($validator->fails()) {
@@ -68,6 +75,13 @@ class CompanyController extends Controller
             'capital' => $request->capital,
             'rc' => $request->rc,
             'legal_form' => $request->legal_form,
+            'city' => $request->city,
+            'region' => $request->region,
+            'ice' => $request->ice,
+            'cnss' => $request->cnss,
+            'patent_number' => $request->patent_number,
+            'activity_sector' => $request->activity_sector,
+            'incorporation_date' => $request->incorporation_date,
             'owner_id' => $request->user()->id,
             'status' => 'pending', // New companies require approval
         ]);
@@ -87,8 +101,12 @@ class CompanyController extends Controller
      */
     public function show(Company $company)
     {
+        // Allow owners and admins to view their companies regardless of status
+        $user = auth('sanctum')->user();
+        $canViewAnyStatus = $user && ($company->isOwnedBy($user) || $user->isSuperAdmin());
+        
         // Only allow viewing active companies for public access
-        if ($company->status !== 'active') {
+        if (!$canViewAnyStatus && $company->status !== 'active') {
             return response()->json([
                 'status' => 'error',
                 'message' => 'Company not found or not available'
@@ -127,6 +145,13 @@ class CompanyController extends Controller
             'capital' => 'nullable|string|max:100',
             'rc' => 'nullable|string|max:100',
             'legal_form' => 'nullable|string|max:100',
+            'city' => 'nullable|string|max:255',
+            'region' => 'nullable|string|max:255',
+            'ice' => 'nullable|string|max:50',
+            'cnss' => 'nullable|string|max:50',
+            'patent_number' => 'nullable|string|max:100',
+            'activity_sector' => 'nullable|string|max:255',
+            'incorporation_date' => 'nullable|date',
         ]);
 
         if ($validator->fails()) {
@@ -145,6 +170,13 @@ class CompanyController extends Controller
             'capital' => $request->capital,
             'rc' => $request->rc,
             'legal_form' => $request->legal_form,
+            'city' => $request->city,
+            'region' => $request->region,
+            'ice' => $request->ice,
+            'cnss' => $request->cnss,
+            'patent_number' => $request->patent_number,
+            'activity_sector' => $request->activity_sector,
+            'incorporation_date' => $request->incorporation_date,
         ]);
 
         $company->load('owner', 'servicesOrProducts');
