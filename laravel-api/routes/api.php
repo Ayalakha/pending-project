@@ -24,6 +24,7 @@ Route::get('/services-products/{serviceOrProduct}', [ServiceOrProductController:
 
 // Public blog routes (browse blogs)
 Route::get('/blogs', [BlogController::class, 'index']);
+Route::get('/blogs/search', [BlogController::class, 'search']);
 Route::get('/blogs/{blog}', [BlogController::class, 'show']);
 Route::get('/blogs/{blog}/comments', [CommentController::class, 'index']);
 
@@ -77,10 +78,6 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/admin/content/moderate', [App\Http\Controllers\Admin\ContentModerationController::class, 'moderate']);
         Route::get('/admin/content/{type}/{id}', [App\Http\Controllers\Admin\ContentModerationController::class, 'show']);
         Route::get('/admin/content/stats', [App\Http\Controllers\Admin\ContentModerationController::class, 'stats']);
-        
-        Route::get('/admin/users', function () {
-            return response()->json(['message' => 'Admin users list']);
-        });
     });
 });
 

@@ -26,6 +26,35 @@ class BlogController extends Controller
     }
 
     /**
+     * Search blogs by title or content
+     */
+    public function search(Request $request)
+    {
+        $query = $request->get('q');
+
+        if (!$query) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Search query is required'
+            ], 400);
+        }
+
+        $blogs = Blog::with(['author:id,username'])
+            ->where('status', 'approved')
+            ->where(function ($q) use ($query) {
+                $q->where('title', 'LIKE', "%{$query}%")
+                  ->orWhere('content', 'LIKE', "%{$query}%");
+            })
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        return response()->json([
+            'status' => 'success',
+            'blogs' => $blogs
+        ]);
+    }
+
+    /**
      * Store a new blog (superAdmin only)
      */
     public function store(Request $request)

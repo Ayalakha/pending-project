@@ -27,16 +27,6 @@ export const adminService = {
     return response.data
   },
 
-  banUser: async (id) => {
-    const response = await api.put(`/admin/users/${id}/ban`)
-    return response.data
-  },
-
-  unbanUser: async (id) => {
-    const response = await api.put(`/admin/users/${id}/unban`)
-    return response.data
-  },
-
   // Company Management
   getAllCompanies: async (params = {}) => {
     const response = await api.get('/admin/companies', { params })
@@ -76,7 +66,7 @@ export const adminService = {
   },
 
   getActivityLogs: async (params = {}) => {
-    const response = await api.get('/admin/activity-logs', { params })
+    const response = await api.get('/admin/activity', { params })
     return response.data
   },
 

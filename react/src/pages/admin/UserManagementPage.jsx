@@ -9,7 +9,6 @@ import {
   MoreVertical,
   Edit,
   Trash2,
-  Ban,
   UserCheck,
   Crown,
   Building2,
