@@ -14,7 +14,10 @@ class BlogController extends Controller
      */
     public function index()
     {
-        $blogs = Blog::with(['author:id,username'])
+        $blogs = Blog::with(['author:id,first_name,last_name'])
+            ->withCount(['comments' => function ($query) {
+                $query->where('status', 'approved');
+            }])
             ->where('status', 'approved')
             ->orderBy('created_at', 'desc')
             ->get();
@@ -39,7 +42,10 @@ class BlogController extends Controller
             ], 400);
         }
 
-        $blogs = Blog::with(['author:id,username'])
+        $blogs = Blog::with(['author:id,first_name,last_name'])
+            ->withCount(['comments' => function ($q) {
+                $q->where('status', 'approved');
+            }])
             ->where('status', 'approved')
             ->where(function ($q) use ($query) {
                 $q->where('title', 'LIKE', "%{$query}%")
@@ -87,7 +93,7 @@ class BlogController extends Controller
             'user_id' => $request->user()->id,
         ]);
 
-        $blog->load('author:id,username');
+        $blog->load('author:id,first_name,last_name');
 
         return response()->json([
             'status' => 'success',
@@ -109,7 +115,7 @@ class BlogController extends Controller
             ], 404);
         }
 
-        $blog->load('author:id,username');
+        $blog->load('author:id,first_name,last_name');
 
         return response()->json([
             'status' => 'success',
@@ -149,7 +155,7 @@ class BlogController extends Controller
             'image' => $request->input('image'),
         ]);
 
-        $blog->load('author:id,username');
+        $blog->load('author:id,first_name,last_name');
 
         return response()->json([
             'status' => 'success',

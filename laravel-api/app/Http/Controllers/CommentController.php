@@ -15,7 +15,7 @@ class CommentController extends Controller
     public function index(Blog $blog)
     {
         $comments = $blog->comments()
-            ->with('user:id,username')
+            ->with('user:id,first_name,last_name')
             ->where('status', 'approved')
             ->orderBy('created_at', 'desc')
             ->get();
@@ -49,7 +49,7 @@ class CommentController extends Controller
             'status' => 'approved', // Auto-approve comments for now
         ]);
 
-        $comment->load('user:id,name');
+        $comment->load('user:id,first_name,last_name');
 
         return response()->json([
             'status' => 'success',
@@ -86,7 +86,7 @@ class CommentController extends Controller
             'content' => $request->input('content'),
         ]);
 
-        $comment->load('user:id,name');
+        $comment->load('user:id,first_name,last_name');
 
         return response()->json([
             'status' => 'success',

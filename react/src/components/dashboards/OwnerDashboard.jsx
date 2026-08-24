@@ -57,7 +57,7 @@ const OwnerDashboard = () => {
                 Business Owner Dashboard
               </h1>
               <p className="text-gray-600">
-                Welcome back, {user?.username}! Manage your business listings here.
+                Welcome back, {user?.first_name}! Manage your business listings here.
               </p>
             </div>
           </div>

@@ -46,7 +46,7 @@ const ReviewList = ({ companyId }) => {
   }
 
   const reviews = reviewsData?.data?.data || []
-  const stats = reviewsData?.data?.company_stats || {}
+  const stats = reviewsData?.company_stats || {}
   const hasUserReview = !!userReviewData?.data
 
   // Filter reviews by rating if selected

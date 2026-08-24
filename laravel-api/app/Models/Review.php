@@ -29,6 +29,11 @@ class Review extends Model
         'rating' => 'integer'
     ];
 
+    protected $appends = [
+        'helpful_votes_count',
+        'is_helpful_to_user',
+    ];
+
     // Relationships
     public function user(): BelongsTo
     {
@@ -65,5 +70,12 @@ class Review extends Model
     public function isHelpfulTo($userId)
     {
         return is_array($this->helpful_votes) && in_array($userId, $this->helpful_votes);
+    }
+
+    public function getIsHelpfulToUserAttribute()
+    {
+        $userId = auth('sanctum')->id();
+
+        return $userId ? $this->isHelpfulTo($userId) : false;
     }
 }

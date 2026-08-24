@@ -58,7 +58,7 @@ const AdminDashboard = () => {
   // Fetch recent activity
   const { data: recentActivity, isLoading: activityLoading } = useQuery({
     queryKey: ['adminActivity'],
-    queryFn: () => adminService.getRecentActivity(),
+    queryFn: () => adminService.getActivityLogs(),
     refetchInterval: 60000, // Refresh every minute
   })
 
@@ -108,7 +108,7 @@ const AdminDashboard = () => {
                 System Administration
               </h1>
               <p className="text-gray-600">
-                Welcome, {user?.username}! Monitor and manage the platform.
+                Welcome, {user?.first_name}! Monitor and manage the platform.
               </p>
             </div>
           </div>

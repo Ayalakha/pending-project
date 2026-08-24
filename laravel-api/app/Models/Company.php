@@ -28,6 +28,7 @@ class Company extends Model
         'activity_sector', // Sector of activity in Morocco
         'incorporation_date',
         'is_verified',
+        'rejection_reason',
     ];
 
     // Relationships

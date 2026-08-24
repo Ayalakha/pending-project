@@ -179,12 +179,18 @@ Route::middleware(['auth:sanctum'])->group(function () {
         }
         
         $targetUser = \App\Models\User::findOrFail($userId);
+
+        // Prevent changing your own role
+        if ($targetUser->id === $user->id) {
+            return response()->json(['message' => 'Cannot change your own role'], 400);
+        }
+
         $newRole = $request->get('role');
-        
+
         if (!in_array($newRole, ['user', 'owner', 'superAdmin'])) {
             return response()->json(['message' => 'Invalid role'], 400);
         }
-        
+
         $targetUser->role = $newRole;
         $targetUser->save();
         
@@ -242,21 +248,23 @@ Route::middleware(['auth:sanctum'])->group(function () {
         
         $company = \App\Models\Company::findOrFail($companyId);
         $company->status = 'active';
+        $company->rejection_reason = null;
         $company->save();
-        
+
         return response()->json(['message' => 'Company approved successfully']);
     });
-    
+
     Route::put('/admin/companies/{companyId}/reject', function (Request $request, $companyId) {
         $user = $request->user();
         if ($user->role !== 'superAdmin') {
             return response()->json(['message' => 'Unauthorized'], 403);
         }
-        
+
         $company = \App\Models\Company::findOrFail($companyId);
         $company->status = 'inactive';
+        $company->rejection_reason = $request->input('reason');
         $company->save();
-        
+
         return response()->json(['message' => 'Company rejected successfully']);
     });
 

@@ -224,7 +224,6 @@ const ContentModerationPage = () => {
                 className="w-full border-2 border-gray-200 rounded-xl px-4 py-3 bg-white focus:border-blue-500 focus:ring-0 transition-colors duration-200 text-gray-700 font-medium"
               >
                 <option value="blogs">📝 Blog Posts Only</option>
-                <option value="blogs">📝 Blogs</option>
                 <option value="comments">💬 Comments</option>
                 <option value="reviews">⭐ Reviews</option>
               </select>

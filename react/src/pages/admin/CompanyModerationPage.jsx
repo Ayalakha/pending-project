@@ -64,13 +64,13 @@ const CompanyCard = ({ company, onUpdate }) => {
   const getStatusBadge = (status) => {
     const variants = {
       pending: 'warning',
-      approved: 'success', 
-      rejected: 'destructive'
+      active: 'success',
+      inactive: 'destructive'
     }
     const labels = {
       pending: 'Pending Review',
-      approved: 'Approved',
-      rejected: 'Rejected'
+      active: 'Approved',
+      inactive: 'Rejected'
     }
     return <Badge variant={variants[status] || 'default'}>{labels[status] || status}</Badge>
   }
@@ -84,6 +84,8 @@ const CompanyCard = ({ company, onUpdate }) => {
       minute: '2-digit'
     })
   }
+
+  const ownerName = [company.owner?.first_name, company.owner?.last_name].filter(Boolean).join(' ') || 'Unknown User'
 
   return (
     <Card className="hover:shadow-lg transition-all duration-200 border-0 shadow-md">
@@ -104,7 +106,7 @@ const CompanyCard = ({ company, onUpdate }) => {
             <div className="grid grid-cols-2 gap-4 text-sm">
               <div className="flex items-center text-gray-600">
                 <User className="h-4 w-4 mr-2 text-gray-400" />
-                <span>{company.user?.username || 'Unknown User'}</span>
+                <span>{ownerName}</span>
               </div>
               <div className="flex items-center text-gray-600">
                 <Calendar className="h-4 w-4 mr-2 text-gray-400" />
@@ -209,8 +211,8 @@ const CompanyCard = ({ company, onUpdate }) => {
                 <div>
                   <h4 className="text-sm font-semibold text-gray-900 mb-1">Owner Information</h4>
                   <div className="text-sm text-gray-600 bg-white p-3 rounded border">
-                    <div><strong>Name:</strong> {company.user?.username}</div>
-                    <div><strong>Email:</strong> {company.user?.email}</div>
+                    <div><strong>Name:</strong> {ownerName}</div>
+                    <div><strong>Email:</strong> {company.owner?.email}</div>
                   </div>
                 </div>
 
@@ -218,6 +220,13 @@ const CompanyCard = ({ company, onUpdate }) => {
                   <h4 className="text-sm font-semibold text-gray-900 mb-1">Submission Date</h4>
                   <p className="text-sm text-gray-600">{formatDate(company.created_at)}</p>
                 </div>
+
+                {company.status === 'inactive' && company.rejection_reason && (
+                  <div>
+                    <h4 className="text-sm font-semibold text-gray-900 mb-1">Rejection Reason</h4>
+                    <p className="text-sm text-red-700 bg-red-50 p-3 rounded border border-red-100">{company.rejection_reason}</p>
+                  </div>
+                )}
               </div>
             </div>
           </div>
@@ -439,7 +448,7 @@ const CompanyModerationPage = () => {
                 </div>
                 <div className="ml-4">
                   <p className="text-sm font-medium text-gray-600">Approved</p>
-                  <p className="text-3xl font-bold text-gray-900">{statusCounts.approved || 0}</p>
+                  <p className="text-3xl font-bold text-gray-900">{statusCounts.active || 0}</p>
                   <div className="flex items-center text-sm text-green-600 mt-1">
                     <Store className="h-3 w-3 mr-1" />
                     <span>Active listings</span>
@@ -457,7 +466,7 @@ const CompanyModerationPage = () => {
                 </div>
                 <div className="ml-4">
                   <p className="text-sm font-medium text-gray-600">Rejected</p>
-                  <p className="text-3xl font-bold text-gray-900">{statusCounts.rejected || 0}</p>
+                  <p className="text-3xl font-bold text-gray-900">{statusCounts.inactive || 0}</p>
                   <div className="flex items-center text-sm text-red-600 mt-1">
                     <X className="h-3 w-3 mr-1" />
                     <span>Declined</span>
@@ -513,8 +522,8 @@ const CompanyModerationPage = () => {
                   >
                     <option value="">All Status</option>
                     <option value="pending">Pending</option>
-                    <option value="approved">Approved</option>
-                    <option value="rejected">Rejected</option>
+                    <option value="active">Approved</option>
+                    <option value="inactive">Rejected</option>
                   </select>
                 </div>
                 

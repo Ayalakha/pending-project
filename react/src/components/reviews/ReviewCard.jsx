@@ -49,6 +49,7 @@ const ReviewCard = ({ review, companyId, onEdit }) => {
 
     const isOwner = user && review.user_id === user.id
     const isAdmin = user && user.role === 'superAdmin'
+    const reviewerName = [review.user?.first_name, review.user?.last_name].filter(Boolean).join(' ')
 
     return (
         <div className="bg-white rounded-xl border border-gray-200 p-6 hover:shadow-md transition-all duration-300 shadow-sm">
@@ -57,11 +58,11 @@ const ReviewCard = ({ review, companyId, onEdit }) => {
                 <div className="flex items-center space-x-3">
                     <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
                         <span className="text-white font-medium text-sm">
-                            {review.user?.name?.charAt(0).toUpperCase()}
+                            {reviewerName.charAt(0).toUpperCase()}
                         </span>
                     </div>
                     <div>
-                        <h4 className="font-medium text-gray-900">{review.user?.name}</h4>
+                        <h4 className="font-medium text-gray-900">{reviewerName}</h4>
                         <div className="flex items-center space-x-2 text-sm text-gray-500">
                             <Calendar className="h-3 w-3" />
                             <span>{formatDate(review.created_at)}</span>

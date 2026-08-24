@@ -41,7 +41,7 @@ const UserDashboard = () => {
           </div>
           <div>
             <h1 className="text-2xl font-bold text-gray-900">
-              Welcome back, {user?.username}!
+              Welcome back, {user?.first_name}!
             </h1>
             <p className="text-gray-600">
               Member since {formatDate(user?.created_at)}

@@ -17,7 +17,7 @@ class ReviewController extends Controller
     public function index(Company $company): JsonResponse
     {
         $reviews = $company->approvedReviews()
-            ->with('user:id,name')
+            ->with('user:id,first_name,last_name')
             ->orderBy('created_at', 'desc')
             ->paginate(10);
 
@@ -63,7 +63,7 @@ class ReviewController extends Controller
             'comment' => $validated['comment'],
         ]);
 
-        $review->load('user:id,name');
+        $review->load('user:id,first_name,last_name');
 
         return response()->json([
             'success' => true,
@@ -92,7 +92,7 @@ class ReviewController extends Controller
         ]);
 
         $review->update($validated);
-        $review->load('user:id,name');
+        $review->load('user:id,first_name,last_name');
 
         return response()->json([
             'success' => true,
@@ -156,7 +156,7 @@ class ReviewController extends Controller
     {
         $review = Review::where('user_id', Auth::id())
             ->where('company_id', $company->id)
-            ->with('user:id,name')
+            ->with('user:id,first_name,last_name')
             ->first();
 
         return response()->json([

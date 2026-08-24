@@ -5,6 +5,8 @@ import { Link } from 'react-router-dom'
 import { useState } from 'react'
 
 const BlogCard = ({ blog }) => {
+  const authorName = [blog.author?.first_name, blog.author?.last_name].filter(Boolean).join(' ') || 'Unknown'
+
   const formatDate = (dateString) => {
     return new Date(dateString).toLocaleDateString('en-US', {
       year: 'numeric',
@@ -43,7 +45,7 @@ const BlogCard = ({ blog }) => {
           </div>
           <div className="flex items-center bg-gray-50 rounded-full px-3 py-1">
             <User className="h-4 w-4 mr-2 text-emerald-500" />
-            Admin
+            {authorName}
           </div>
           {blog.comments_count > 0 && (
             <div className="flex items-center bg-gray-50 rounded-full px-3 py-1">
@@ -72,7 +74,7 @@ const BlogCard = ({ blog }) => {
           <div className="flex items-center space-x-2">
             {blog.status && (
               <span className={`px-3 py-1 text-xs font-medium rounded-full ${
-                blog.status === 'published' 
+                blog.status === 'approved'
                   ? 'bg-emerald-100 text-emerald-700'
                   : 'bg-amber-100 text-amber-700'
               }`}>
@@ -95,16 +97,18 @@ const BlogCard = ({ blog }) => {
 
 const BlogsPage = () => {
   const [searchQuery, setSearchQuery] = useState('')
+  const [activeSearch, setActiveSearch] = useState('')
 
   const { data, isLoading, error } = useQuery({
-    queryKey: ['blogs'],
-    queryFn: () => blogService.getBlogs(),
+    queryKey: ['blogs', activeSearch],
+    queryFn: () => activeSearch
+      ? blogService.searchBlogs(activeSearch)
+      : blogService.getBlogs(),
   })
 
   const handleSearch = (e) => {
     e.preventDefault()
-    // TODO: Implement search functionality
-    console.log('Search for:', searchQuery)
+    setActiveSearch(searchQuery.trim())
   }
 
   if (isLoading) {
