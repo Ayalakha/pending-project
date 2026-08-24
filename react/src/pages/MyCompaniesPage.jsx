@@ -201,23 +201,6 @@ const MyCompaniesPage = () => {
   const { user, isAuthenticated } = useAuth()
   const queryClient = useQueryClient()
 
-  // Redirect if not authenticated or not an owner
-  if (!isAuthenticated) {
-    return <Navigate to="/login" replace />
-  }
-
-  if (user?.role !== 'owner' && user?.role !== 'superAdmin') {
-    return (
-      <div className="container mx-auto px-4 py-8">
-        <div className="bg-red-50 border border-red-200 rounded-lg p-6 text-center">
-          <AlertCircle className="h-12 w-12 text-red-600 mx-auto mb-4" />
-          <h2 className="text-lg font-medium text-red-800 mb-2">Access Denied</h2>
-          <p className="text-red-600">Only business owners can access this page.</p>
-        </div>
-      </div>
-    )
-  }
-
   // Fetch user's companies
   const { data: companiesData, isLoading, error } = useQuery({
     queryKey: ['myCompanies'],
@@ -237,6 +220,23 @@ const MyCompaniesPage = () => {
   })
 
   const companies = companiesData?.companies || []
+
+  // Redirect if not authenticated or not an owner
+  if (!isAuthenticated) {
+    return <Navigate to="/login" replace />
+  }
+
+  if (user?.role !== 'owner' && user?.role !== 'superAdmin') {
+    return (
+      <div className="container mx-auto px-4 py-8">
+        <div className="bg-red-50 border border-red-200 rounded-lg p-6 text-center">
+          <AlertCircle className="h-12 w-12 text-red-600 mx-auto mb-4" />
+          <h2 className="text-lg font-medium text-red-800 mb-2">Access Denied</h2>
+          <p className="text-red-600">Only business owners can access this page.</p>
+        </div>
+      </div>
+    )
+  }
 
   if (isLoading) {
     return (

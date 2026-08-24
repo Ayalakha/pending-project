@@ -336,11 +336,6 @@ const CompanyModerationPage = () => {
   const [searchTerm, setSearchTerm] = useState('')
   const [statusFilter, setStatusFilter] = useState('')
 
-  // Check admin permissions
-  if (!isAuthenticated || user?.role !== 'superAdmin') {
-    return <Navigate to="/login" replace />
-  }
-
   // Fetch companies
   const { data: companiesData, isLoading, error, refetch } = useQuery({
     queryKey: ['adminCompanies', searchTerm, statusFilter],
@@ -363,6 +358,11 @@ const CompanyModerationPage = () => {
     acc[status] = (acc[status] || 0) + 1
     return acc
   }, {})
+
+  // Check admin permissions
+  if (!isAuthenticated || user?.role !== 'superAdmin') {
+    return <Navigate to="/login" replace />
+  }
 
   if (isLoading) {
     return (

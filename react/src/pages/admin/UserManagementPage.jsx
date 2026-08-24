@@ -234,11 +234,6 @@ const UserManagementPage = () => {
   const [searchTerm, setSearchTerm] = useState('')
   const [roleFilter, setRoleFilter] = useState('')
 
-  // Check admin permissions
-  if (!isAuthenticated || user?.role !== 'superAdmin') {
-    return <Navigate to="/login" replace />
-  }
-
   // Fetch users
   const { data: usersData, isLoading, error, refetch } = useQuery({
     queryKey: ['adminUsers', searchTerm, roleFilter],
@@ -253,6 +248,11 @@ const UserManagementPage = () => {
 
   const handleRefresh = () => {
     refetch()
+  }
+
+  // Check admin permissions
+  if (!isAuthenticated || user?.role !== 'superAdmin') {
+    return <Navigate to="/login" replace />
   }
 
   if (isLoading) {

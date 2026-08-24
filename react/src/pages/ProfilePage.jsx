@@ -54,10 +54,6 @@ const ProfilePage = () => {
     }
   }, [user])
 
-  if (!isAuthenticated) {
-    return <Navigate to="/login" replace />
-  }
-
   const formatDate = (dateString) => {
     return new Date(dateString).toLocaleDateString('en-US', {
       year: 'numeric',
@@ -157,6 +153,10 @@ const ProfilePage = () => {
       setErrors(error.response?.data?.errors || { general: 'Failed to change password' })
     }
   })
+
+  if (!isAuthenticated) {
+    return <Navigate to="/login" replace />
+  }
 
   const handleProfileSubmit = (e) => {
     e.preventDefault()

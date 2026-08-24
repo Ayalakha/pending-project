@@ -223,11 +223,6 @@ const AnalyticsDashboard = () => {
   const [selectedPeriod, setSelectedPeriod] = useState('30d')
   const [selectedMetric, setSelectedMetric] = useState('users')
 
-  // Check admin permissions
-  if (!isAuthenticated || user?.role !== 'superAdmin') {
-    return <Navigate to="/login" replace />
-  }
-
   // Fetch analytics data
   const { data: overviewData, isLoading: overviewLoading } = useQuery({
     queryKey: ['analytics-overview'],
@@ -264,6 +259,11 @@ const AnalyticsDashboard = () => {
     queryKey: ['analytics-top-performers'],
     queryFn: analyticsService.getTopPerformers,
   })
+
+  // Check admin permissions
+  if (!isAuthenticated || user?.role !== 'superAdmin') {
+    return <Navigate to="/login" replace />
+  }
 
   const handleExport = async (type) => {
     try {

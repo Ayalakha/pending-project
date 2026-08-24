@@ -20,6 +20,8 @@ class CompanySeeder extends Seeder
                 'email' => "owner{$i}@business.com"
             ], [
                 'username' => "Business Owner {$i}",
+                'first_name' => 'Business',
+                'last_name' => "Owner {$i}",
                 'password' => bcrypt('password'),
                 'role' => 'owner'
             ]);

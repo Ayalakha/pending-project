@@ -17,6 +17,8 @@ class AdminSeeder extends Seeder
             'email' => 'admin@demo.com'
         ], [
             'username' => 'Super Admin',
+            'first_name' => 'Super',
+            'last_name' => 'Admin',
             'password' => bcrypt('password123'),
             'role' => 'superAdmin'
         ]);
@@ -26,6 +28,8 @@ class AdminSeeder extends Seeder
             'email' => 'owner@demo.com'
         ], [
             'username' => 'Demo Owner',
+            'first_name' => 'Demo',
+            'last_name' => 'Owner',
             'password' => bcrypt('password123'),
             'role' => 'owner'
         ]);
@@ -34,6 +38,8 @@ class AdminSeeder extends Seeder
             'email' => 'user@demo.com'
         ], [
             'username' => 'Demo User',
+            'first_name' => 'Demo',
+            'last_name' => 'User',
             'password' => bcrypt('password123'),
             'role' => 'user'
         ]);

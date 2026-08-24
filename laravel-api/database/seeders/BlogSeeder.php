@@ -18,6 +18,8 @@ class BlogSeeder extends Seeder
             'email' => 'superadmin@test.com'
         ], [
             'username' => 'Super Administrator',
+            'first_name' => 'Super',
+            'last_name' => 'Administrator',
             'password' => bcrypt('password'),
             'role' => 'superAdmin'
         ]);
