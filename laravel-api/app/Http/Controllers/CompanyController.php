@@ -28,6 +28,21 @@ class CompanyController extends Controller
             });
         }
 
+        // Filter by category/activity sector. Category labels shown to users can be
+        // compound (e.g. "Technology & IT"), so also match on their significant words
+        // to still catch companies whose sector is just "Technology".
+        if ($request->has('category') && !empty($request->category)) {
+            $category = $request->category;
+            $words = array_filter(preg_split('/[\s&]+/', $category), fn ($w) => strlen($w) > 2);
+
+            $query->where(function ($q) use ($category, $words) {
+                $q->where('activity_sector', 'LIKE', "%{$category}%");
+                foreach ($words as $word) {
+                    $q->orWhere('activity_sector', 'LIKE', "%{$word}%");
+                }
+            });
+        }
+
         $companies = $query->paginate(20);
 
         return response()->json([

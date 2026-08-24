@@ -96,6 +96,9 @@ const CompaniesPage = () => {
   const [localSearch, setLocalSearch] = useState('')
   const [currentPage, setCurrentPage] = useState(1)
   const searchQuery = searchParams.get('search') || ''
+  const categoryFilter = searchParams.get('category') || ''
+  // Category values arrive lowercased from links like the homepage's category cards
+  const categoryLabel = categoryFilter.replace(/\b\w/g, (c) => c.toUpperCase())
   const pageFromUrl = parseInt(searchParams.get('page')) || 1
 
   // Sync local search with URL search params
@@ -107,10 +110,11 @@ const CompaniesPage = () => {
   }, [searchQuery, pageFromUrl])
 
   const { data, isLoading, error } = useQuery({
-    queryKey: ['companies', searchQuery, currentPage],
+    queryKey: ['companies', searchQuery, categoryFilter, currentPage],
     queryFn: () => {
       const params = {}
       if (searchQuery) params.search = searchQuery
+      if (categoryFilter) params.category = categoryFilter
       if (currentPage > 1) params.page = currentPage
       return companyService.getCompanies(params)
     },
@@ -120,20 +124,19 @@ const CompaniesPage = () => {
     e.preventDefault()
     console.log('Search submitted:', localSearch.trim())
     console.log('Current URL:', window.location.href)
-    
+
     setCurrentPage(1) // Reset to first page when searching
-    
+
+    // Preserve the active category filter (if any) while updating the search term
+    const newParams = new URLSearchParams(searchParams)
+    newParams.delete('page')
     if (localSearch.trim()) {
-      // Update URL with search parameter
-      const newParams = new URLSearchParams()
       newParams.set('search', localSearch.trim())
-      setSearchParams(newParams)
-      console.log('Setting search params to:', newParams.toString())
     } else {
-      // Clear search if empty
-      setSearchParams({})
-      console.log('Clearing search params')
+      newParams.delete('search')
     }
+    setSearchParams(newParams)
+    console.log('Setting search params to:', newParams.toString())
   }
 
   const clearSearch = () => {
@@ -145,6 +148,20 @@ const CompaniesPage = () => {
     newParams.delete('page')
     setSearchParams(newParams)
     console.log('Search cleared, new URL should be:', window.location.pathname)
+  }
+
+  const clearCategory = () => {
+    setCurrentPage(1)
+    const newParams = new URLSearchParams(searchParams)
+    newParams.delete('category')
+    newParams.delete('page')
+    setSearchParams(newParams)
+  }
+
+  const clearAllFilters = () => {
+    setLocalSearch('')
+    setCurrentPage(1)
+    setSearchParams({})
   }
 
   const handlePageChange = (page) => {
@@ -323,14 +340,16 @@ const CompaniesPage = () => {
             <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
               {searchQuery ? (
                 <span>Search Results for "{searchQuery}"</span>
+              ) : categoryFilter ? (
+                <span>{categoryLabel}</span>
               ) : (
                 <span>Business Directory</span>
               )}
             </h1>
-            
+
             <p className="text-lg text-gray-600 mb-12 max-w-2xl mx-auto">
-              {searchQuery 
-                ? `${companies.length} companies found`
+              {searchQuery || categoryFilter
+                ? `${pagination?.total ?? companies.length} companies found`
                 : 'Discover verified businesses and professional services'
               }
             </p>
@@ -364,15 +383,26 @@ const CompaniesPage = () => {
               </div>
             </form>
 
-            {searchQuery && (
-              <div className="mt-6">
-                <button
-                  onClick={clearSearch}
-                  className="inline-flex items-center px-3 py-1 text-sm bg-red-200 text-gray-600 hover:text-gray-900 transition-colors duration-200"
-                >
-                  <X className="h-4 w-4 mr-1" />
-                  Clear search
-                </button>
+            {(searchQuery || categoryFilter) && (
+              <div className="mt-6 flex items-center justify-center gap-3">
+                {categoryFilter && (
+                  <button
+                    onClick={clearCategory}
+                    className="inline-flex items-center px-3 py-1 text-sm bg-blue-100 text-blue-700 rounded-full hover:bg-blue-200 transition-colors duration-200"
+                  >
+                    <X className="h-4 w-4 mr-1" />
+                    {categoryLabel}
+                  </button>
+                )}
+                {searchQuery && (
+                  <button
+                    onClick={clearSearch}
+                    className="inline-flex items-center px-3 py-1 text-sm bg-red-200 text-gray-600 hover:text-gray-900 transition-colors duration-200"
+                  >
+                    <X className="h-4 w-4 mr-1" />
+                    Clear search
+                  </button>
+                )}
               </div>
             )}
           </div>
@@ -391,14 +421,14 @@ const CompaniesPage = () => {
                 No Companies Found
               </h3>
               <p className="text-xl text-gray-600 mb-8 max-w-md mx-auto">
-                {searchQuery 
+                {searchQuery || categoryFilter
                   ? 'Try adjusting your search terms or browse all companies'
                   : 'Be the first to add your company to our directory!'
                 }
               </p>
-              {searchQuery && (
+              {(searchQuery || categoryFilter) && (
                 <button
-                  onClick={clearSearch}
+                  onClick={clearAllFilters}
                   className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white px-8 py-3 rounded-xl font-semibold transition-all duration-300 hover:scale-105"
                 >
                   View All Companies
@@ -411,7 +441,7 @@ const CompaniesPage = () => {
               <div className="flex items-center justify-between mb-12">
                 <div>
                   <h2 className="text-3xl font-bold text-gray-900 mb-2">
-                    {searchQuery ? 'Search Results' : 'All Companies'}
+                    {searchQuery || categoryFilter ? 'Search Results' : 'All Companies'}
                   </h2>
                   <p className="text-gray-600">
                     {pagination ? (

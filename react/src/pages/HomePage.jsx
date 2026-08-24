@@ -1,28 +1,36 @@
 import { Search, Building2, Users, TrendingUp, ArrowRight, Shield, Star, CheckCircle, Globe, Target, Award, Briefcase, Coffee, HeartHandshake, Clock, MapPin, Zap, Users2, Trophy } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { useState } from 'react'
+import { useQuery } from '@tanstack/react-query'
 import { useAuth } from '../contexts/AuthContext'
+import { statsService } from '../services/statsService'
 
 const HomePage = () => {
   const [searchQuery, setSearchQuery] = useState('')
   const { user, isAuthenticated } = useAuth()
 
+  const { data: statsData } = useQuery({
+    queryKey: ['platformStats'],
+    queryFn: () => statsService.getStats(),
+    staleTime: 5 * 60 * 1000
+  })
+
   const stats = [
     {
       label: 'Verified Companies',
-      value: '6+',
+      value: statsData?.stats?.verified_companies ?? '—',
       icon: Building2,
       description: 'Thoroughly vetted businesses'
     },
     {
       label: 'Service Categories',
-      value: '18+',
+      value: statsData?.stats?.service_categories ?? '—',
       icon: TrendingUp,
       description: 'Diverse professional services'
     },
     {
       label: 'Satisfied Users',
-      value: '100+',
+      value: statsData?.stats?.users ?? '—',
       icon: Users,
       description: 'Growing trusted community'
     },
@@ -141,7 +149,11 @@ const HomePage = () => {
             {/* Badge */}
             <div className="inline-flex items-center space-x-2 px-4 py-2 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-blue-200 text-sm font-medium">
               <Trophy className="w-4 h-4" />
-              <span>Trusted by 100+ Businesses</span>
+              <span>
+                {statsData?.stats
+                  ? `Trusted by ${statsData.stats.verified_companies} Verified Businesses`
+                  : 'A Trusted Business Directory'}
+              </span>
             </div>
 
             {/* Main Heading */}

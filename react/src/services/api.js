@@ -26,13 +26,12 @@ api.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401) {
-      // Only redirect if this is an auth-related endpoint or user action
-      const isAuthEndpoint = error.config?.url?.includes('/auth/') || 
-                           error.config?.url?.includes('/user') ||
-                           error.config?.url?.includes('/profile')
-      
-      if (isAuthEndpoint) {
-        // Token expired or invalid for auth endpoints
+      // A 401 from the login attempt itself just means "wrong credentials" -
+      // let LoginPage show that error instead of wiping the (already empty) session.
+      const isLoginAttempt = error.config?.url?.includes('/auth/login')
+
+      if (!isLoginAttempt) {
+        // Any other 401 means the session/token is stale or invalid - log the user out.
         localStorage.removeItem('auth_token')
         localStorage.removeItem('user')
         // Only redirect if not already on login page

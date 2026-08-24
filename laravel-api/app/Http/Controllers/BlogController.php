@@ -20,7 +20,7 @@ class BlogController extends Controller
             }])
             ->where('status', 'approved')
             ->orderBy('created_at', 'desc')
-            ->get();
+            ->paginate(12);
 
         return response()->json([
             'status' => 'success',
@@ -52,7 +52,7 @@ class BlogController extends Controller
                   ->orWhere('content', 'LIKE', "%{$query}%");
             })
             ->orderBy('created_at', 'desc')
-            ->get();
+            ->paginate(12);
 
         return response()->json([
             'status' => 'success',

@@ -1,8 +1,8 @@
 import { useQuery } from '@tanstack/react-query'
 import { blogService } from '../services/blogService'
-import { Calendar, User, MessageCircle, Loader2, Search, Eye, ArrowRight, BookOpen, Clock } from 'lucide-react'
-import { Link } from 'react-router-dom'
-import { useState } from 'react'
+import { Calendar, User, MessageCircle, Loader2, Search, Eye, ArrowRight, BookOpen, ChevronLeft, ChevronRight } from 'lucide-react'
+import { Link, useSearchParams } from 'react-router-dom'
+import { useState, useEffect } from 'react'
 
 const BlogCard = ({ blog }) => {
   const authorName = [blog.author?.first_name, blog.author?.last_name].filter(Boolean).join(' ') || 'Unknown'
@@ -96,19 +96,42 @@ const BlogCard = ({ blog }) => {
 }
 
 const BlogsPage = () => {
+  const [searchParams, setSearchParams] = useSearchParams()
   const [searchQuery, setSearchQuery] = useState('')
-  const [activeSearch, setActiveSearch] = useState('')
+  const activeSearch = searchParams.get('search') || ''
+  const [currentPage, setCurrentPage] = useState(parseInt(searchParams.get('page')) || 1)
+
+  useEffect(() => {
+    setSearchQuery(activeSearch)
+    setCurrentPage(parseInt(searchParams.get('page')) || 1)
+  }, [activeSearch, searchParams])
 
   const { data, isLoading, error } = useQuery({
-    queryKey: ['blogs', activeSearch],
-    queryFn: () => activeSearch
-      ? blogService.searchBlogs(activeSearch)
-      : blogService.getBlogs(),
+    queryKey: ['blogs', activeSearch, currentPage],
+    queryFn: () => {
+      const params = currentPage > 1 ? { page: currentPage } : {}
+      return activeSearch
+        ? blogService.searchBlogs(activeSearch, params)
+        : blogService.getBlogs(params)
+    },
   })
 
   const handleSearch = (e) => {
     e.preventDefault()
-    setActiveSearch(searchQuery.trim())
+    const newParams = new URLSearchParams()
+    if (searchQuery.trim()) newParams.set('search', searchQuery.trim())
+    setSearchParams(newParams)
+  }
+
+  const handlePageChange = (page) => {
+    const newParams = new URLSearchParams(searchParams)
+    if (page > 1) {
+      newParams.set('page', page.toString())
+    } else {
+      newParams.delete('page')
+    }
+    setSearchParams(newParams)
+    window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
   if (isLoading) {
@@ -155,6 +178,97 @@ const BlogsPage = () => {
   }
 
   const blogs = data?.blogs?.data || data?.blogs || []
+  const pagination = data?.blogs?.current_page ? data.blogs : null
+
+  const PaginationControls = () => {
+    if (!pagination || !pagination.last_page || pagination.last_page <= 1) return null
+
+    const page = pagination.current_page
+    const lastPage = pagination.last_page
+    const hasNext = pagination.next_page_url
+    const hasPrev = pagination.prev_page_url
+
+    return (
+      <div className="flex items-center justify-center space-x-2 mt-12">
+        <button
+          onClick={() => handlePageChange(page - 1)}
+          disabled={!hasPrev}
+          className={`flex items-center px-4 py-2 rounded-lg font-medium transition-all duration-200 ${
+            hasPrev
+              ? 'bg-white border border-gray-200 text-gray-700 hover:bg-gray-50 hover:border-gray-300'
+              : 'bg-gray-100 text-gray-400 cursor-not-allowed'
+          }`}
+        >
+          <ChevronLeft className="w-4 h-4 mr-1" />
+          Previous
+        </button>
+
+        <div className="flex items-center space-x-1">
+          {page > 2 && (
+            <>
+              <button
+                onClick={() => handlePageChange(1)}
+                className="w-10 h-10 rounded-lg font-medium text-gray-700 hover:bg-gray-100 transition-colors duration-200"
+              >
+                1
+              </button>
+              {page > 3 && <span className="text-gray-400 px-2">...</span>}
+            </>
+          )}
+
+          {page > 1 && (
+            <button
+              onClick={() => handlePageChange(page - 1)}
+              className="w-10 h-10 rounded-lg font-medium text-gray-700 hover:bg-gray-100 transition-colors duration-200"
+            >
+              {page - 1}
+            </button>
+          )}
+
+          <button
+            className="w-10 h-10 rounded-lg font-medium bg-blue-600 text-white"
+            disabled
+          >
+            {page}
+          </button>
+
+          {page < lastPage && (
+            <button
+              onClick={() => handlePageChange(page + 1)}
+              className="w-10 h-10 rounded-lg font-medium text-gray-700 hover:bg-gray-100 transition-colors duration-200"
+            >
+              {page + 1}
+            </button>
+          )}
+
+          {page < lastPage - 1 && (
+            <>
+              {page < lastPage - 2 && <span className="text-gray-400 px-2">...</span>}
+              <button
+                onClick={() => handlePageChange(lastPage)}
+                className="w-10 h-10 rounded-lg font-medium text-gray-700 hover:bg-gray-100 transition-colors duration-200"
+              >
+                {lastPage}
+              </button>
+            </>
+          )}
+        </div>
+
+        <button
+          onClick={() => handlePageChange(page + 1)}
+          disabled={!hasNext}
+          className={`flex items-center px-4 py-2 rounded-lg font-medium transition-all duration-200 ${
+            hasNext
+              ? 'bg-white border border-gray-200 text-gray-700 hover:bg-gray-50 hover:border-gray-300'
+              : 'bg-gray-100 text-gray-400 cursor-not-allowed'
+          }`}
+        >
+          Next
+          <ChevronRight className="w-4 h-4 ml-1" />
+        </button>
+      </div>
+    )
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 via-white to-gray-50">
@@ -165,7 +279,7 @@ const BlogsPage = () => {
             {/* Simple Badge */}
             <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-blue-50 text-blue-600 text-sm font-medium mb-8">
               <BookOpen className="w-4 h-4" />
-              <span>{blogs.length} Articles</span>
+              <span>{pagination?.total ?? blogs.length} Articles</span>
             </div>
 
             <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
@@ -222,7 +336,7 @@ const BlogsPage = () => {
                   Featured Articles
                 </h2>
                 <p className="text-gray-600">
-                  Showing {blogs.length} {blogs.length === 1 ? 'article' : 'articles'}
+                  Showing {blogs.length} of {pagination?.total ?? blogs.length} {(pagination?.total ?? blogs.length) === 1 ? 'article' : 'articles'}
                 </p>
               </div>
 
@@ -232,24 +346,12 @@ const BlogsPage = () => {
                   <BlogCard key={blog.id} blog={blog} />
                 ))}
               </div>
+
+              <PaginationControls />
             </>
           )}
         </div>
       </section>
-
-      {/* Pagination Section */}
-      {data?.blogs?.total > (data?.blogs?.per_page || 10) && (
-        <section className="py-16 border-t border-gray-100">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="text-center">
-              <div className="inline-flex items-center px-4 py-2 bg-gray-100 rounded-xl">
-                <Clock className="w-4 h-4 text-gray-500 mr-2" />
-                <span className="text-sm text-gray-600 font-medium">Pagination coming soon...</span>
-              </div>
-            </div>
-          </div>
-        </section>
-      )}
     </div>
   )
 }

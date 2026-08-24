@@ -6,12 +6,16 @@ use App\Http\Controllers\CommentController;
 use App\Http\Controllers\CompanyController;
 use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\ServiceOrProductController;
+use App\Http\Controllers\StatsController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 // Public routes
 Route::post('/auth/register', [AuthController::class, 'register']);
 Route::post('/auth/login', [AuthController::class, 'login']);
+
+// Public platform stats (homepage)
+Route::get('/stats', [StatsController::class, 'index']);
 
 // Public company routes (browse companies)
 Route::get('/companies', [CompanyController::class, 'index']);

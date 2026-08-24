@@ -32,8 +32,8 @@ export const blogService = {
   },
 
   // Search blogs
-  searchBlogs: async (query) => {
-    const response = await api.get('/blogs/search', { params: { q: query } })
+  searchBlogs: async (query, params = {}) => {
+    const response = await api.get('/blogs/search', { params: { ...params, q: query } })
     return response.data
   }
 }
