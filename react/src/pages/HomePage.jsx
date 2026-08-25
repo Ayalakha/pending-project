@@ -45,18 +45,18 @@ const HomePage = () => {
       icon: '💻'
     },
     {
-      name: 'Business Consulting',
+      name: 'Professional Services',
       count: 2,
       color: 'from-emerald-500 to-teal-600',
       description: 'Strategic planning & optimization',
       icon: '📊'
     },
     {
-      name: 'Marketing & Advertising',
+      name: 'Media & Entertainment',
       count: 1,
       color: 'from-purple-500 to-violet-600',
-      description: 'Digital marketing & branding',
-      icon: '📈'
+      description: 'Media production & entertainment',
+      icon: '🎬'
     },
     {
       name: 'Healthcare & Wellness',
@@ -66,10 +66,10 @@ const HomePage = () => {
       icon: '🏥'
     },
     {
-      name: 'Architecture & Design',
+      name: 'Construction',
       count: 1,
       color: 'from-amber-500 to-orange-600',
-      description: 'Architectural & design services',
+      description: 'Building & construction services',
       icon: '🏗️'
     },
     {

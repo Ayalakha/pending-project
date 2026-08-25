@@ -91,6 +91,9 @@ class BlogController extends Controller
             'content' => $request->input('content'),
             'image' => $request->input('image'),
             'user_id' => $request->user()->id,
+            'status' => 'approved',
+            'moderated_by' => $request->user()->id,
+            'moderated_at' => now(),
         ]);
 
         $blog->load('author:id,first_name,last_name');
