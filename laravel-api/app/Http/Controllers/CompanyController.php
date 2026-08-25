@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Company;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 
 class CompanyController extends Controller
@@ -59,7 +60,7 @@ class CompanyController extends Controller
         $validator = Validator::make($request->all(), [
             'name' => 'required|string|max:255',
             'description' => 'nullable|string|max:1000',
-            'logo' => 'nullable|string|max:255',
+            'logo' => 'nullable|image|mimes:jpeg,jpg,png,webp|max:2048',
             'website' => 'nullable|url|max:255',
             'phone_number' => 'nullable|string|max:50',
             'capital' => 'nullable|string|max:100',
@@ -81,10 +82,14 @@ class CompanyController extends Controller
             ], 422);
         }
 
+        $logoPath = $request->hasFile('logo')
+            ? $request->file('logo')->store('company-logos', 'public')
+            : null;
+
         $company = Company::create([
             'name' => $request->name,
             'description' => $request->description,
-            'logo' => $request->logo,
+            'logo' => $logoPath ? Storage::disk('public')->url($logoPath) : null,
             'website' => $request->website,
             'phone_number' => $request->phone_number,
             'capital' => $request->capital,
@@ -154,7 +159,8 @@ class CompanyController extends Controller
         $validator = Validator::make($request->all(), [
             'name' => 'required|string|max:255',
             'description' => 'nullable|string|max:1000',
-            'logo' => 'nullable|string|max:255',
+            'logo' => 'nullable|image|mimes:jpeg,jpg,png,webp|max:2048',
+            'remove_logo' => 'nullable|boolean',
             'website' => 'nullable|url|max:255',
             'phone_number' => 'nullable|string|max:50',
             'capital' => 'nullable|string|max:100',
@@ -176,10 +182,19 @@ class CompanyController extends Controller
             ], 422);
         }
 
+        $logo = $company->logo;
+        if ($request->hasFile('logo')) {
+            Company::deleteStoredLogo($company->logo);
+            $logo = Storage::disk('public')->url($request->file('logo')->store('company-logos', 'public'));
+        } elseif ($request->boolean('remove_logo')) {
+            Company::deleteStoredLogo($company->logo);
+            $logo = null;
+        }
+
         $company->update([
             'name' => $request->name,
             'description' => $request->description,
-            'logo' => $request->logo,
+            'logo' => $logo,
             'website' => $request->website,
             'phone_number' => $request->phone_number,
             'capital' => $request->capital,
@@ -217,6 +232,7 @@ class CompanyController extends Controller
         }
 
         $companyName = $company->name;
+        Company::deleteStoredLogo($company->logo);
         $company->delete();
 
         return response()->json([

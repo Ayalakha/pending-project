@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Support\Facades\Storage;
 
 class Company extends Model
 {
@@ -56,6 +57,26 @@ class Company extends Model
     public function isOwnedBy(User $user)
     {
         return $this->owner_id === $user->id;
+    }
+
+    /**
+     * Delete a company logo file from the public disk, given the URL stored
+     * in the `logo` column (older records may hold arbitrary URLs, not ours).
+     */
+    public static function deleteStoredLogo(?string $logoUrl): void
+    {
+        if (!$logoUrl) {
+            return;
+        }
+
+        $marker = '/storage/';
+        $position = strpos($logoUrl, $marker);
+        if ($position === false) {
+            return;
+        }
+
+        $relativePath = substr($logoUrl, $position + strlen($marker));
+        Storage::disk('public')->delete($relativePath);
     }
 
     public function getFormattedCapitalAttribute()

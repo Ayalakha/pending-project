@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use App\Models\Blog;
 use App\Models\Comment;
+use App\Models\Company;
 use App\Models\Review;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -209,6 +210,12 @@ class AuthController extends Controller
 
             // personal_access_tokens is polymorphic, not covered by a DB FK cascade
             $user->tokens()->delete();
+
+            // companies cascade-delete at the DB level, which skips Company::destroy()
+            // and would otherwise orphan logo files on disk - clean those up first
+            foreach ($user->companies as $company) {
+                Company::deleteStoredLogo($company->logo);
+            }
 
             // companies, blogs, comments, reviews (and services_or_products via companies)
             // cascade-delete at the DB level

@@ -9,7 +9,9 @@ import {
   ArrowLeft,
   AlertCircle,
   Save,
-  X
+  X,
+  Upload,
+  Image as ImageIcon
 } from 'lucide-react'
 
 // Legal forms (Moroccan legal forms)
@@ -86,10 +88,23 @@ const CompanyFormPage = () => {
     cnss: '',
     patent_number: '',
     activity_sector: '',
-    incorporation_date: ''
+    incorporation_date: '',
+    remove_logo: false
   })
 
   const [errors, setErrors] = useState({})
+  const [logoPreviewUrl, setLogoPreviewUrl] = useState(null)
+
+  // formData.logo is either an existing logo URL (string, from the server) or a
+  // newly-picked File - build a preview URL for whichever one is currently set.
+  useEffect(() => {
+    if (formData.logo instanceof File) {
+      const objectUrl = URL.createObjectURL(formData.logo)
+      setLogoPreviewUrl(objectUrl)
+      return () => URL.revokeObjectURL(objectUrl)
+    }
+    setLogoPreviewUrl(formData.logo || null)
+  }, [formData.logo])
 
   // Fetch company data for editing
   const { data: companyData, isLoading: isLoadingCompany, error: companyError } = useQuery({
@@ -174,6 +189,30 @@ const CompanyFormPage = () => {
         [name]: null
       }))
     }
+  }
+
+  const handleLogoChange = (e) => {
+    const file = e.target.files[0]
+    if (!file) return
+
+    const allowedTypes = ['image/jpeg', 'image/png', 'image/webp']
+    if (!allowedTypes.includes(file.type)) {
+      setErrors(prev => ({ ...prev, logo: 'Logo must be a JPEG, PNG, or WebP image' }))
+      e.target.value = ''
+      return
+    }
+    if (file.size > 2 * 1024 * 1024) {
+      setErrors(prev => ({ ...prev, logo: 'Logo must be smaller than 2MB' }))
+      e.target.value = ''
+      return
+    }
+
+    setFormData(prev => ({ ...prev, logo: file, remove_logo: false }))
+    setErrors(prev => ({ ...prev, logo: null }))
+  }
+
+  const handleRemoveLogo = () => {
+    setFormData(prev => ({ ...prev, logo: '', remove_logo: true }))
   }
 
   const validateForm = () => {
@@ -348,20 +387,50 @@ const CompanyFormPage = () => {
               />
             </div>
 
-            {/* Logo URL */}
+            {/* Logo */}
             <div>
               <label htmlFor="logo" className="block text-sm font-medium text-gray-700 mb-2">
-                Logo URL
+                Company Logo
               </label>
-              <input
-                type="url"
-                id="logo"
-                name="logo"
-                value={formData.logo}
-                onChange={handleChange}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none transition-colors"
-                placeholder="https://example.com/logo.png"
-              />
+              <div className="flex items-center gap-4">
+                <div className="w-20 h-20 rounded-lg border border-gray-200 bg-gray-50 flex items-center justify-center overflow-hidden shrink-0">
+                  {logoPreviewUrl ? (
+                    <img src={logoPreviewUrl} alt="Logo preview" className="w-full h-full object-cover" />
+                  ) : (
+                    <ImageIcon className="h-8 w-8 text-gray-300" />
+                  )}
+                </div>
+                <div className="flex-1">
+                  <label
+                    htmlFor="logo"
+                    className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors text-sm font-medium text-gray-700"
+                  >
+                    <Upload className="h-4 w-4 mr-2" />
+                    {logoPreviewUrl ? 'Change logo' : 'Upload logo'}
+                  </label>
+                  <input
+                    type="file"
+                    id="logo"
+                    name="logo"
+                    accept="image/jpeg,image/png,image/webp"
+                    onChange={handleLogoChange}
+                    className="hidden"
+                  />
+                  {logoPreviewUrl && (
+                    <button
+                      type="button"
+                      onClick={handleRemoveLogo}
+                      className="ml-3 text-sm text-red-600 hover:text-red-700"
+                    >
+                      Remove
+                    </button>
+                  )}
+                  <p className="text-xs text-gray-500 mt-1">JPEG, PNG, or WebP, up to 2MB</p>
+                </div>
+              </div>
+              {errors.logo && (
+                <p className="mt-1 text-sm text-red-600">{errors.logo}</p>
+              )}
             </div>
 
             {/* Website */}
