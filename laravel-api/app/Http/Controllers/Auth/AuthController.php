@@ -3,8 +3,12 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Models\Blog;
+use App\Models\Comment;
+use App\Models\Review;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 
@@ -172,6 +176,48 @@ class AuthController extends Controller
         return response()->json([
             'status' => 'success',
             'message' => 'Password changed successfully'
+        ]);
+    }
+
+    public function deleteAccount(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'password' => 'required',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'status' => 'error',
+                'errors' => $validator->errors()
+            ], 422);
+        }
+
+        $user = $request->user();
+
+        if (!Hash::check($request->password, $user->password)) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Password is incorrect'
+            ], 422);
+        }
+
+        DB::transaction(function () use ($user) {
+            // moderated_by FKs have no cascade rule, so null them out before deleting
+            Blog::where('moderated_by', $user->id)->update(['moderated_by' => null]);
+            Comment::where('moderated_by', $user->id)->update(['moderated_by' => null]);
+            Review::where('moderated_by', $user->id)->update(['moderated_by' => null]);
+
+            // personal_access_tokens is polymorphic, not covered by a DB FK cascade
+            $user->tokens()->delete();
+
+            // companies, blogs, comments, reviews (and services_or_products via companies)
+            // cascade-delete at the DB level
+            $user->delete();
+        });
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Account deleted successfully'
         ]);
     }
 }

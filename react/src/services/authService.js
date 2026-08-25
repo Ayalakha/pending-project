@@ -117,6 +117,20 @@ export const authService = {
   changePassword: async (passwordData) => {
     const response = await api.post('/auth/change-password', passwordData)
     return response.data
+  },
+
+  // Delete account
+  deleteAccount: async (password) => {
+    const response = await api.delete('/auth/account', { data: { password } })
+
+    if (response.data.status === 'success') {
+      // Clear local storage and authorization header
+      localStorage.removeItem('auth_token')
+      localStorage.removeItem('user')
+      delete api.defaults.headers.common['Authorization']
+    }
+
+    return response.data
   }
 }
 

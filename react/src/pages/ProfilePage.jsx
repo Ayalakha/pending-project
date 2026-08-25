@@ -6,7 +6,7 @@ import { Navigate } from 'react-router-dom'
 import { useMutation } from '@tanstack/react-query'
 
 const ProfilePage = () => {
-  const { user, isAuthenticated, updateProfile: updateUserContext } = useAuth()
+  const { user, isAuthenticated, updateProfile: updateUserContext, deleteAccount } = useAuth()
   
   console.log('ProfilePage rendering with user:', user)
   console.log('ProfilePage user first_name:', user?.first_name)
@@ -14,10 +14,13 @@ const ProfilePage = () => {
   
   const [isEditingProfile, setIsEditingProfile] = useState(false)
   const [isChangingPassword, setIsChangingPassword] = useState(false)
+  const [isDeletingAccount, setIsDeletingAccount] = useState(false)
+  const [deletePassword, setDeletePassword] = useState('')
   const [showPassword, setShowPassword] = useState({
     current: false,
     new: false,
-    confirm: false
+    confirm: false,
+    delete: false
   })
 
   // Profile form state
@@ -154,6 +157,20 @@ const ProfilePage = () => {
     }
   })
 
+  // Delete account mutation
+  const deleteAccountMutation = useMutation({
+    mutationFn: (password) => deleteAccount(password),
+    onSuccess: (result) => {
+      if (!result.success) {
+        setErrors({ general: result.error })
+      }
+      // On success, isAuthenticated flips to false and the redirect below kicks in
+    },
+    onError: () => {
+      setErrors({ general: 'Failed to delete account. Please try again.' })
+    }
+  })
+
   if (!isAuthenticated) {
     return <Navigate to="/login" replace />
   }
@@ -166,6 +183,18 @@ const ProfilePage = () => {
   const handlePasswordSubmit = (e) => {
     e.preventDefault()
     changePasswordMutation.mutate(passwordForm)
+  }
+
+  const handleDeleteSubmit = (e) => {
+    e.preventDefault()
+    if (!window.confirm(
+      "This will permanently delete your account, along with your companies and reviews. " +
+      "It will also delete all blog posts you've authored and any comments on them, " +
+      "including comments from other users. This cannot be undone. Continue?"
+    )) {
+      return
+    }
+    deleteAccountMutation.mutate(deletePassword)
   }
 
   const handleProfileChange = (e) => {
@@ -602,14 +631,69 @@ const ProfilePage = () => {
           <div className="bg-red-50 rounded-lg p-4">
             <h4 className="text-md font-medium text-red-600 mb-2">Delete Account</h4>
             <p className="text-sm text-red-600 mb-4">
-              Once you delete your account, there is no going back. Please be certain.
+              Once you delete your account, there is no going back. All your companies, blogs,
+              comments, and reviews will be permanently deleted — including all comments on
+              your blog posts, even ones left by other users. Please be certain.
             </p>
-            <button 
-              className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
-              onClick={() => alert('Account deletion is not yet implemented')}
-            >
-              Delete Account
-            </button>
+
+            {isDeletingAccount ? (
+              <form onSubmit={handleDeleteSubmit} className="max-w-md space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-red-700 mb-2">
+                    Confirm your password *
+                  </label>
+                  <div className="relative">
+                    <input
+                      type={showPassword.delete ? 'text' : 'password'}
+                      name="delete_password"
+                      value={deletePassword}
+                      onChange={(e) => setDeletePassword(e.target.value)}
+                      className="w-full px-3 py-2 pr-10 border border-red-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none"
+                      required
+                    />
+                    <button
+                      type="button"
+                      onClick={() => togglePasswordVisibility('delete')}
+                      className="absolute right-3 top-1/2 transform -translate-y-1/2 bg-white text-gray-400 hover:text-gray-600"
+                    >
+                      {showPassword.delete ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                    </button>
+                  </div>
+                  {errors.password && (
+                    <p className="text-red-600 text-sm mt-1">{errors.password[0]}</p>
+                  )}
+                </div>
+
+                <div className="flex items-center space-x-4">
+                  <button
+                    type="submit"
+                    disabled={deleteAccountMutation.isPending}
+                    className="px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors disabled:opacity-50"
+                  >
+                    {deleteAccountMutation.isPending ? 'Deleting...' : 'Permanently Delete Account'}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setIsDeletingAccount(false)
+                      setDeletePassword('')
+                      setErrors({})
+                    }}
+                    className="flex items-center px-6 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors"
+                  >
+                    <X className="h-4 w-4 mr-2" />
+                    Cancel
+                  </button>
+                </div>
+              </form>
+            ) : (
+              <button
+                className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+                onClick={() => setIsDeletingAccount(true)}
+              >
+                Delete Account
+              </button>
+            )}
           </div>
         </div>
       </div>

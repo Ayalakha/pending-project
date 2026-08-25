@@ -133,6 +133,25 @@ export const AuthProvider = ({ children }) => {
     }
   }
 
+  // Delete account
+  const deleteAccount = async (password) => {
+    try {
+      const response = await authService.deleteAccount(password)
+
+      if (response.status === 'success') {
+        setUser(null)
+        setIsAuthenticated(false)
+        return { success: true }
+      } else {
+        return { success: false, error: response.message || 'Account deletion failed' }
+      }
+    } catch (error) {
+      console.error('Delete account error:', error)
+      const errorMessage = error.response?.data?.message || 'Account deletion failed. Please try again.'
+      return { success: false, error: errorMessage }
+    }
+  }
+
   // Direct user update function for context
   const updateUserContext = (updatedUser) => {
     setUser(updatedUser)
@@ -158,6 +177,7 @@ export const AuthProvider = ({ children }) => {
     logout,
     updateProfile,
     updateUserContext,
+    deleteAccount,
     hasRole,
     isOwner,
     isSuperAdmin

@@ -43,7 +43,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/auth/profile', [AuthController::class, 'profile']);
     Route::put('/auth/profile', [AuthController::class, 'updateProfile']);
     Route::post('/auth/change-password', [AuthController::class, 'changePassword']);
-    
+    Route::delete('/auth/account', [AuthController::class, 'deleteAccount']);
+
     // User routes (all authenticated users)
     // Comments on blogs - any authenticated user can comment
     Route::post('/blogs/{blog}/comments', [CommentController::class, 'store']);
