@@ -6,6 +6,7 @@ import { useAuth } from '../contexts/AuthContext'
 import { statsService } from '../services/statsService'
 import { companyService } from '../services/companyService'
 import StarRating from '../components/reviews/StarRating'
+import CompanyLogo from '../components/company/CompanyLogo'
 
 const CATEGORY_TINTS = ['bg-blue-50', 'bg-emerald-50', 'bg-purple-50', 'bg-rose-50', 'bg-amber-50', 'bg-orange-50']
 
@@ -164,11 +165,13 @@ const HomePage = () => {
                     key={company?.id ?? index}
                     className="aspect-square bg-white rounded-xl border border-gray-200 flex items-center justify-center p-3"
                   >
-                    {company?.logo ? (
-                      <img
-                        src={company.logo}
-                        alt={`${company.name} logo`}
-                        className="w-full h-full object-contain"
+                    {company ? (
+                      <CompanyLogo
+                        company={company}
+                        sizeClassName="w-full h-full"
+                        roundedClassName="rounded-lg"
+                        textClassName="text-sm"
+                        objectFitClassName="object-contain"
                       />
                     ) : (
                       <Building2 className="w-6 h-6 text-gray-300" />
@@ -272,16 +275,14 @@ const HomePage = () => {
                   to={`/companies/${company.id}`}
                   className="bg-white rounded-2xl border border-gray-200 p-6 hover:border-gray-300 hover:shadow-sm transition-all"
                 >
-                  <div className="w-14 h-14 rounded-xl bg-gray-100 flex items-center justify-center mb-4 overflow-hidden">
-                    {company.logo ? (
-                      <img
-                        src={company.logo}
-                        alt={`${company.name} logo`}
-                        className="w-full h-full object-contain"
-                      />
-                    ) : (
-                      <Building2 className="w-6 h-6 text-gray-400" />
-                    )}
+                  <div className="w-14 h-14 rounded-xl mb-4 overflow-hidden">
+                    <CompanyLogo
+                      company={company}
+                      sizeClassName="w-full h-full"
+                      roundedClassName="rounded-xl"
+                      textClassName="text-sm"
+                      objectFitClassName="object-contain"
+                    />
                   </div>
                   <h3 className="font-bold text-gray-900 mb-1 line-clamp-1">{company.name}</h3>
                   {company.activity_sector && (

@@ -2,9 +2,9 @@ import { useQuery } from '@tanstack/react-query'
 import { useParams, Link } from 'react-router-dom'
 import { companyService } from '../services/companyService'
 import ReviewList from '../components/reviews/ReviewList'
-import { 
-  Building2, 
-  MapPin, 
+import CompanyLogo from '../components/company/CompanyLogo'
+import {
+  MapPin,
   Phone, 
   Globe, 
   Mail, 
@@ -121,17 +121,13 @@ const CompanyDetailPage = () => {
         <div className="flex flex-col lg:flex-row lg:items-start space-y-6 lg:space-y-0 lg:space-x-8">
           {/* Company Logo */}
           <div className="flex-shrink-0">
-            {company.logo ? (
-              <img
-                src={company.logo}
-                alt={`${company.name} logo`}
-                className="w-32 h-32 rounded-xl object-cover border border-gray-200"
-              />
-            ) : (
-              <div className="w-32 h-32 bg-primary-100 rounded-xl flex items-center justify-center">
-                <Building2 className="h-16 w-16 text-primary-600" />
-              </div>
-            )}
+            <CompanyLogo
+              company={company}
+              sizeClassName="w-32 h-32"
+              roundedClassName="rounded-xl"
+              textClassName="text-3xl"
+              extraClassName="border border-gray-200"
+            />
           </div>
 
           {/* Company Info */}

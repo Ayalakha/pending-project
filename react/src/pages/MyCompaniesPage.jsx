@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { companyService } from '../services/companyService'
 import { useAuth } from '../contexts/AuthContext'
+import CompanyLogo from '../components/company/CompanyLogo'
 import { 
   Building2, 
   Plus, 
@@ -37,17 +38,7 @@ const CompanyCard = ({ company, onDelete }) => {
         <div className="flex items-start space-x-4 flex-1">
           {/* Company Logo */}
           <div className="flex-shrink-0">
-            {company.logo ? (
-              <img
-                src={company.logo}
-                alt={`${company.name} logo`}
-                className="w-16 h-16 rounded-lg object-cover"
-              />
-            ) : (
-              <div className="w-16 h-16 bg-primary-100 rounded-lg flex items-center justify-center">
-                <Building2 className="h-8 w-8 text-primary-600" />
-              </div>
-            )}
+            <CompanyLogo company={company} sizeClassName="w-16 h-16" roundedClassName="rounded-lg" textClassName="text-lg" />
           </div>
 
           {/* Company Info */}

@@ -1,6 +1,7 @@
 import { useQuery } from '@tanstack/react-query'
 import { companyService } from '../services/companyService'
 import StarRating from '../components/reviews/StarRating'
+import CompanyLogo from '../components/company/CompanyLogo'
 import { Building2, MapPin, Phone, Globe, Users, Loader2, Search, X, ArrowRight, Star, Filter, ChevronLeft, ChevronRight } from 'lucide-react'
 import { Link, useSearchParams } from 'react-router-dom'
 import { useState, useEffect } from 'react'
@@ -11,17 +12,13 @@ const CompanyCard = ({ company }) => {
       <div className="flex items-start space-x-6">
         {/* Company Logo */}
         <div className="flex-shrink-0">
-          {company.logo ? (
-            <img
-              src={company.logo}
-              alt={`${company.name} logo`}
-              className="w-20 h-20 rounded-2xl object-cover shadow-lg"
-            />
-          ) : (
-            <div className="w-20 h-20 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-2xl flex items-center justify-center shadow-lg group-hover:scale-105 transition-transform duration-300">
-              <Building2 className="h-10 w-10 text-white" />
-            </div>
-          )}
+          <CompanyLogo
+            company={company}
+            sizeClassName="w-20 h-20"
+            roundedClassName="rounded-2xl"
+            textClassName="text-2xl"
+            extraClassName="shadow-lg group-hover:scale-105 transition-transform duration-300"
+          />
         </div>
 
         {/* Company Info */}

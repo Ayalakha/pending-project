@@ -30,6 +30,7 @@ class Company extends Model
         'incorporation_date',
         'is_verified',
         'rejection_reason',
+        'external_source_url', // Source URL for companies imported from an external directory
     ];
 
     // Relationships
