@@ -55,11 +55,11 @@ const Header = () => {
             <Link to="/" className="flex items-center space-x-3 group">
               <div className="relative">
                 <div className="absolute inset-0 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-xl blur-sm opacity-0 group-hover:opacity-20 transition-opacity duration-300"></div>
-                <Building2 className="relative h-10 w-10 text-blue-600 group-hover:text-indigo-600 transition-colors duration-300" />
+                <img src="/logo/icon.png" alt="IndexMA" className="relative h-14 w-14" />
               </div>
               <div className="flex flex-col">
                 <span className="text-2xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
-                  BizDirectory
+                  IndexMA
                 </span>
                 <span className="text-xs text-gray-500 font-medium tracking-wide">
                   Professional Network

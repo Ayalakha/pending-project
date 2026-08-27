@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Link, useNavigate, useLocation, useSearchParams } from 'react-router-dom'
 import { useAuth } from '../../contexts/AuthContext'
-import { Mail, Lock, Eye, EyeOff, Loader2, Building2, ArrowRight, Shield } from 'lucide-react'
+import { Mail, Lock, Eye, EyeOff, Loader2, ArrowRight, Shield } from 'lucide-react'
 
 const LoginPage = () => {
   const navigate = useNavigate()
@@ -66,10 +66,8 @@ const LoginPage = () => {
         {/* Header */}
         <div className="text-center mb-12">
           <Link to="/" className="inline-flex items-center space-x-3 mb-8 group">
-            <div className="w-12 h-12 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-2xl flex items-center justify-center group-hover:scale-105 transition-transform duration-300">
-              <Building2 className="h-6 w-6 text-white" />
-            </div>
-            <span className="text-2xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">BizDirectory</span>
+            <img src="/logo/icon.png" alt="IndexMA" className="h-16 w-16" />
+            <span className="text-2xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">IndexMA</span>
           </Link>
           
           <h2 className="text-4xl font-bold text-gray-900 mb-4">

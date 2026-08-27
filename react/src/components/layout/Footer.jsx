@@ -1,4 +1,4 @@
-import { Building2, Mail, Phone, MapPin, Heart } from 'lucide-react'
+import { Mail, Phone, MapPin, Heart } from 'lucide-react'
 import { Link } from 'react-router-dom'
 
 const Footer = () => {
@@ -16,11 +16,11 @@ const Footer = () => {
             <div className="flex items-center space-x-3 mb-6">
               <div className="relative">
                 <div className="absolute inset-0 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-xl blur-sm opacity-20"></div>
-                <Building2 className="relative h-10 w-10 text-blue-400" />
+                <img src="/logo/icon.png" alt="IndexMA" className="relative h-14 w-14" />
               </div>
               <div className="flex flex-col">
                 <span className="text-2xl font-bold bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">
-                  BizDirectory
+                  IndexMA
                 </span>
                 <span className="text-xs text-gray-400 font-medium tracking-wide">
                   Professional Network
@@ -34,7 +34,7 @@ const Footer = () => {
             <div className="flex flex-col space-y-3">
               <div className="flex items-center space-x-3 text-gray-300">
                 <Mail className="h-4 w-4 text-blue-400" />
-                <span className="text-sm">contact@bizdirectory.com</span>
+                <span className="text-sm">contact@indexma.com</span>
               </div>
               <div className="flex items-center space-x-3 text-gray-300">
                 <Phone className="h-4 w-4 text-blue-400" />
@@ -102,7 +102,7 @@ const Footer = () => {
         <div className="border-t border-gray-800/50 mt-12 pt-8">
           <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
             <p className="text-gray-400 text-sm">
-              © 2025 BizDirectory. All rights reserved.
+              © 2025 IndexMA. All rights reserved.
             </p>
             <div className="flex items-center space-x-2 text-gray-400 text-sm">
               <span>Made with</span>
