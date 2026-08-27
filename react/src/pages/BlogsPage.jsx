@@ -3,6 +3,7 @@ import { blogService } from '../services/blogService'
 import { Calendar, User, MessageCircle, Loader2, Search, Eye, ArrowRight, BookOpen, ChevronLeft, ChevronRight } from 'lucide-react'
 import { Link, useSearchParams } from 'react-router-dom'
 import { useState, useEffect } from 'react'
+import BlogImagePlaceholder from '../components/blog/BlogImagePlaceholder'
 
 const BlogCard = ({ blog }) => {
   const authorName = [blog.author?.first_name, blog.author?.last_name].filter(Boolean).join(' ') || 'Unknown'
@@ -26,15 +27,17 @@ const BlogCard = ({ blog }) => {
   return (
     <article className="group bg-white rounded-3xl overflow-hidden border border-gray-100 hover:border-blue-200 hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
       {/* Blog Image */}
-      {blog.image && (
-        <div className="aspect-video w-full overflow-hidden">
+      <div className="aspect-video w-full overflow-hidden">
+        {blog.image ? (
           <img
             src={blog.image}
             alt={blog.title}
             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
           />
-        </div>
-      )}
+        ) : (
+          <BlogImagePlaceholder blog={blog} className="w-full h-full group-hover:scale-105 transition-transform duration-300" />
+        )}
+      </div>
 
       <div className="p-8">
         {/* Blog Meta */}

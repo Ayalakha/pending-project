@@ -2,18 +2,21 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useParams, Link } from 'react-router-dom'
 import { blogService, commentService } from '../services/blogService'
 import { useAuth } from '../contexts/AuthContext'
-import { 
-  Calendar, 
-  User, 
-  MessageCircle, 
-  ArrowLeft, 
+import {
+  Calendar,
+  User,
+  MessageCircle,
+  ArrowLeft,
   Loader2,
   Send,
   Edit2,
   Trash2,
-  Eye
+  Eye,
+  ExternalLink,
 } from 'lucide-react'
 import { useState } from 'react'
+import BlogImagePlaceholder from '../components/blog/BlogImagePlaceholder'
+import { getBlogSourceName } from '../utils/blogSource'
 
 const CommentForm = ({ blogId, onSuccess }) => {
   const { isAuthenticated } = useAuth()
@@ -345,20 +348,43 @@ const BlogDetailPage = () => {
         </div>
 
         {/* Blog Image */}
-        {blog.image && (
-          <div className="mb-8">
+        <div className="mb-8">
+          {blog.image ? (
             <img
               src={blog.image}
               alt={blog.title}
               className="w-full h-64 lg:h-96 object-cover rounded-lg"
             />
-          </div>
-        )}
+          ) : (
+            <BlogImagePlaceholder blog={blog} className="w-full h-64 lg:h-96 rounded-lg" />
+          )}
+        </div>
 
         {/* Blog Content */}
         <div className="prose prose-lg max-w-none">
           <div dangerouslySetInnerHTML={{ __html: blog.content }} />
         </div>
+
+        {/* Continue Reading CTA (imported posts only) */}
+        {blog.external_source_url && (
+          <div className="mt-8 p-6 bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-100 rounded-2xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+            <div>
+              <p className="text-sm font-medium text-gray-500 mb-1">This is a summary</p>
+              <p className="text-gray-900 font-semibold">
+                Read the full article on {getBlogSourceName(blog.external_source_url)}
+              </p>
+            </div>
+            <a
+              href={blog.external_source_url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex-shrink-0 inline-flex items-center bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white px-5 py-3 rounded-xl font-medium transition-all duration-300 hover:scale-105"
+            >
+              Continue reading on {getBlogSourceName(blog.external_source_url)}
+              <ExternalLink className="h-4 w-4 ml-2" />
+            </a>
+          </div>
+        )}
       </article>
 
       {/* Comments Section */}

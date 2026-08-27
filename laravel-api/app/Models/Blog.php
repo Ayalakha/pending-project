@@ -13,6 +13,7 @@ class Blog extends Model
         'title',
         'content',
         'image',
+        'external_source_url',
         'user_id',
         'status',
         'moderation_notes',
