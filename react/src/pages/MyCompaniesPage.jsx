@@ -13,7 +13,8 @@ import {
   Loader2,
   AlertCircle,
   Calendar,
-  CreditCard
+  CreditCard,
+  Package
 } from 'lucide-react'
 import { Link, Navigate } from 'react-router-dom'
 import { useState } from 'react'
@@ -169,6 +170,13 @@ const CompanyCard = ({ company, onDelete }) => {
             title="Edit Company"
           >
             <Edit className="h-4 w-4" />
+          </Link>
+          <Link
+            to={`/companies/${company.id}/manage-items`}
+            className="text-purple-600 hover:text-purple-700 p-2 rounded-lg hover:bg-purple-50 transition-colors"
+            title="Manage Services & Products"
+          >
+            <Package className="h-4 w-4" />
           </Link>
           <button
             onClick={handleDelete}

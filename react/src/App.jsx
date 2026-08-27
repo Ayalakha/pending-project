@@ -9,6 +9,7 @@ import CompaniesPage from './pages/CompaniesPage'
 import CompanyDetailPage from './pages/CompanyDetailPage'
 import MyCompaniesPage from './pages/MyCompaniesPage'
 import CompanyFormPage from './pages/CompanyFormPage'
+import ManageServicesPage from './pages/ManageServicesPage'
 import BlogsPage from './pages/BlogsPage'
 import BlogDetailPage from './pages/BlogDetailPage'
 import DashboardPage from './pages/DashboardPage'
@@ -17,6 +18,8 @@ import LoginPage from './pages/auth/LoginPage'
 import RegisterPage from './pages/auth/RegisterPage'
 import UserManagementPage from './pages/admin/UserManagementPage'
 import CompanyModerationPage from './pages/admin/CompanyModerationPage'
+import BlogManagementPage from './pages/admin/BlogManagementPage'
+import BlogFormPage from './pages/admin/BlogFormPage'
 import ContentModerationPage from './components/admin/ContentModerationPage'
 import AnalyticsDashboard from './pages/admin/AnalyticsDashboard'
 import OwnerAnalytics from './pages/owner/OwnerAnalytics'
@@ -62,6 +65,7 @@ const AppContent = () => {
             <Route path="/my-companies" element={<MyCompaniesPage />} />
             <Route path="/companies/new" element={<CompanyFormPage />} />
             <Route path="/companies/:id/edit" element={<CompanyFormPage />} />
+            <Route path="/companies/:id/manage-items" element={<ManageServicesPage />} />
             <Route path="/blogs" element={<BlogsPage />} />
             <Route path="/blogs/:id" element={<BlogDetailPage />} />
             <Route path="/dashboard" element={<DashboardPage />} />
@@ -69,6 +73,9 @@ const AppContent = () => {
             <Route path="/admin/users" element={<UserManagementPage />} />
             <Route path="/admin/companies" element={<CompanyModerationPage />} />
             <Route path="/admin/content-moderation" element={<ContentModerationPage />} />
+            <Route path="/admin/blogs" element={<BlogManagementPage />} />
+            <Route path="/admin/blogs/new" element={<BlogFormPage />} />
+            <Route path="/admin/blogs/:id/edit" element={<BlogFormPage />} />
             <Route path="/admin/analytics" element={<AnalyticsDashboard />} />
             <Route path="/owner/analytics" element={<OwnerAnalytics />} />
             <Route path="/login" element={<LoginPage />} />

@@ -22,7 +22,8 @@ import {
   Bell,
   Database,
   Lock,
-  Globe
+  Globe,
+  PenSquare
 } from 'lucide-react'
 import { Link } from 'react-router-dom'
 
@@ -301,7 +302,7 @@ const AdminDashboard = () => {
       {/* Admin Actions */}
       <div className="mt-8 bg-white rounded-lg shadow-sm border border-gray-200 p-6">
         <h2 className="text-lg font-semibold text-gray-900 mb-4">Quick Actions</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
           <Link 
             to="/admin/users" 
             className="block p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors group"
@@ -340,8 +341,19 @@ const AdminDashboard = () => {
             </div>
           </Link>
 
-          <Link 
-            to="/admin/analytics" 
+          <Link
+            to="/admin/blogs"
+            className="block p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors group"
+          >
+            <div className="text-center">
+              <PenSquare className="h-8 w-8 text-gray-600 group-hover:text-teal-600 mx-auto mb-2 transition-colors" />
+              <p className="font-medium text-gray-900">Write Blog Post</p>
+              <p className="text-sm text-gray-600">Create and manage blog content</p>
+            </div>
+          </Link>
+
+          <Link
+            to="/admin/analytics"
             className="block p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors group"
           >
             <div className="text-center">
